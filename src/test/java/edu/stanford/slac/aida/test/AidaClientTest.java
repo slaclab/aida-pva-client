@@ -18,6 +18,7 @@ public class AidaClientTest {
                     .get();
             assertEquals(16800, response);
         } catch (RPCRequestException e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }

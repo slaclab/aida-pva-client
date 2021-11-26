@@ -128,7 +128,7 @@ public class AidaPvaRequest {
         try {
             client = new RPCClientImpl(channelName);
         } catch (Exception e) {
-            throw new RPCRequestException(FATAL, e.getMessage());
+            throw new RPCRequestException(FATAL, e.getMessage(), e);
         }
 
         // Build the arguments structure
@@ -157,7 +157,7 @@ public class AidaPvaRequest {
             client.destroy();
             ClientFactory.stop();
         } catch (Exception e) {
-            throw new RPCRequestException(WARNING, e.getMessage());
+            throw new RPCRequestException(WARNING, e.getMessage(), e);
         }
         return result;
     }
