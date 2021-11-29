@@ -11,7 +11,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <epics-core.version>7.0.7</epics-core.version>
+        <epics-core.version>7.0.6</epics-core.version>
     </properties>
 
     <dependencies>
