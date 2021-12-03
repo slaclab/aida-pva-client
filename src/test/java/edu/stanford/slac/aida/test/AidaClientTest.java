@@ -63,12 +63,11 @@ public class AidaClientTest {
     void test5() {
         try {
             System.out.println("Test for request().setReturningTable() - AidaTable");
-            AidaTable table = request("TRIG:LI31:109:TACT ")
+            AidaTable table = request("TRIG:LI31:109:TACT")
                     .with("BEAM", 1)
                     .setReturningTable(0);
             assertEquals(0, table.getValues().get("status").get(0));
         } catch (RPCRequestException e) {
-            e.printStackTrace();
             fail(e.getMessage());
         }
     }
