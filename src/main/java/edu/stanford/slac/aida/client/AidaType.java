@@ -14,32 +14,26 @@ import org.epics.pvdata.pv.*;
 public enum AidaType {
     VOID,           ///< Means that this setter does not return a value (only valid for setters)
 
-    BOOLEAN,        ///< Getter returns a boolean
-    BYTE,           ///< Getter returns a byte
-    CHAR,           ///< There is no CHAR type in AIDA-PVA you must use BYTE, but if you want to obtain a char you can specify CHAR to our test suite, and it will request a BYTE and automatically translate the resulting byte response to char.
-    SHORT,          ///< Getter returns a short
-    INTEGER,        ///< Getter returns an integer
-    LONG,           ///< Getter returns a long
-    FLOAT,          ///< Getter returns a float
-    DOUBLE,         ///< Getter returns a double
-    STRING,         ///< Getter returns a string
+    BOOLEAN,        ///< Getter returns Boolean
+    BYTE,           ///< Getter returns Byte
+    CHAR,           ///< Getter returns Byte
+    SHORT,          ///< Getter returns a Short
+    INTEGER,        ///< Getter returns an Integer
+    LONG,           ///< Getter returns a Long
+    FLOAT,          ///< Getter returns a Float
+    DOUBLE,         ///< Getter returns a Double
+    STRING,         ///< Getter returns a String
 
-    BOOLEAN_ARRAY,  ///< Getter returns a boolean array
-    BYTE_ARRAY,     ///< Getter returns a byte array
-    /**
-     * There is no #CHAR_ARRAY type in AIDA-PVA's edu.stanford.slac.aida.lib.model.AidaType you must use
-     * edu.stanford.slac.aida.lib.model.AidaType.BYTE_ARRAY, but if you want to obtain a char[]
-     * you can specify #CHAR_ARRAY to our test suite, and it will request
-     * a edu.stanford.slac.aida.lib.model.AidaType.BYTE_ARRAY and automatically translate the resulting byte[] response to char[].
-     */
-    CHAR_ARRAY,
-    SHORT_ARRAY,    ///< Getter returns a short array
-    INTEGER_ARRAY,  ///< Getter returns an integer array
-    LONG_ARRAY,     ///< Getter returns a long array
-    FLOAT_ARRAY,    ///< Getter returns a float array
-    DOUBLE_ARRAY,   ///< Getter returns a double array
-    STRING_ARRAY,   ///< Getter returns a string array
-    TABLE;          ///< Getter or setter returns a table
+    BOOLEAN_ARRAY,  ///< Getter returns a List<Boolean>
+    BYTE_ARRAY,     ///< Getter returns a List<Byte>
+    CHAR_ARRAY,     ///< Getter returns a List<Byte>
+    SHORT_ARRAY,    ///< Getter returns a List<Short>
+    INTEGER_ARRAY,  ///< Getter returns an List<Integer>
+    LONG_ARRAY,     ///< Getter returns a List<Long>
+    FLOAT_ARRAY,    ///< Getter returns a List<Float>
+    DOUBLE_ARRAY,   ///< Getter returns a List<Double>
+    STRING_ARRAY,   ///< Getter returns a List<String>
+    TABLE;          ///< Getter or setter returns an AidaTable
 
     /**
      * Normative Type ID string for URIs

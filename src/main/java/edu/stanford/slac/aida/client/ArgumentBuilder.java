@@ -108,7 +108,7 @@ class ArgumentBuilder {
     }
 
     /**
-     * From a given value determine the type of field that should be created to hold its value
+     * Internal: From a given value determine the type of field that should be created to hold its value
      *
      * @param value the given value
      * @return the field to hold this value
@@ -166,17 +166,17 @@ class ArgumentBuilder {
     }
 
     /**
-     * Set the field values in the arguments in the query.
+     * Internal: Set the field values in the arguments in the query.
      * See {@link ArgumentBuilder} for more information.
      *
      * @param query the query
      */
-    public void initializeQuery(PVStructure query) {
+    void initializeQuery(PVStructure query) {
         initializeStructure(query, fieldMap);
     }
 
     /**
-     * Set the field values in the given structure.
+     * Internal: Set the field values in the given structure.
      * Assumes that the structure has been created with field names that match the keys in the valueMap
      * Also assumes that the types of the values and structure fields match
      *
@@ -184,7 +184,7 @@ class ArgumentBuilder {
      * @param valueMap  the values to set in the structure
      */
     @SuppressWarnings("unchecked")
-    public void initializeStructure(PVStructure structure, Map<String, Object> valueMap) {
+    private void initializeStructure(PVStructure structure, Map<String, Object> valueMap) {
         for (Map.Entry<String, Object> entrySet : valueMap.entrySet()) {
             String name = entrySet.getKey();
             Object value = entrySet.getValue();

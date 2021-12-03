@@ -19,7 +19,6 @@ package edu.stanford.slac.aida.client;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
-import org.epics.pvdata.pv.PVByteArray;
 import org.epics.pvdata.pv.PVField;
 import org.epics.pvdata.pv.PVStringArray;
 import org.epics.pvdata.pv.PVStructure;
@@ -37,11 +36,11 @@ import java.util.stream.Collectors;
  * In order to write a query it is very easy.
  * @subsection p1 e.g. 1: Simple get
  * @code
- *  Float bact = getRequest("XCOR:LI03:120:LEFF", FLOAT, "Float BACT");
+ *  Float bact = getRequest("XCOR:LI03:120:LEFF", FLOAT);
  * @endcode
  * @subsection p2 e.g. 2: Multiple arguments
  * @code
- *  request("NDRFACET:BUFFACQ", "BPM Values")
+ *  request("NDRFACET:BUFFACQ")
  *      .with("BPMD", 57)
  *      .with("NRPOS", 180)
  *      .with("BPMS", List.of(
@@ -53,18 +52,19 @@ import java.util.stream.Collectors;
  * @endcode
  * @subsection p3 e.g. 3: Simple set
  * @code
- *  AidaTable table = setRequest("XCOR:LI31:41:BCON", 5.0f);
+ *  setRequest("XCOR:LI31:41:BCON", 5.0f);
  * @endcode
  * @subsection p4 e.g. 4: Advanced set
  * @code
- *  Short status = request("KLYS:LI31:31:TACT", "Deactivated")
+ *  Short status = ((AidaTable)request("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
- *      .set(0);
+ *      .setReturningTable(0)
+ *      ).getValues().get("status").get(0);
  * @endcode
  * @subsection p5 e.g. 5: Selecting the return value type
- * @code testSuiteHeader(" AIDA - PVA SLC Klystron TESTS ");
- *  String value = request("KLYS:LI31:31:TACT", "String")
+ * @code
+ *  String value = request("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
  *      .returning(STRING)
@@ -86,7 +86,7 @@ public class AidaPvaClientUtils {
      * Builder for any request.  When the get() or set() are finally called the test runs and
      * the results are displayed in a standardised format
      *
-     * @param query   the starting query for this request
+     * @param query the starting query for this request
      * @return An AidaPvaRequest that can be further configured before calling get() or set()
      */
     public static AidaPvaRequest request(final String query) {
@@ -94,49 +94,43 @@ public class AidaPvaClientUtils {
     }
 
     /**
-     * Call this to run a query for channels with no arguments
-     *  @param query   the request
-     * @param type    the type expected
+     * Call a channel getter with no arguments
+     *
+     * @param channel the channel
+     * @param type  the type expected
      */
-    public static Object getRequest(final String query, AidaType type) throws RPCRequestException {
+    public static Object getRequest(final String channel, AidaType type) throws RPCRequestException {
         String stringType = type.toString();
         if (type.equals(AidaType.TABLE)) {
-            return getTableRequest(query);
+            return getTableRequest(channel);
         } else if (stringType.endsWith("_ARRAY")) {
-            return getArrayRequest(query, type);
+            return getArrayRequest(channel, type);
         } else {
-            return getScalarRequest(query, type);
+            return getScalarRequest(channel, type);
         }
     }
 
     /**
-     * Call this to run a setter test that does not return anything
+     * Call a channel setter with the given value.
      *
-     * @param query the request
+     * @param channel the channel
      * @param value the value to set
      */
-    public static void setRequest(final String query, Object value) throws RPCRequestException {
-        new AidaPvaRequest(query).setter(value);
+    public static void setRequest(final String channel, Object value) throws RPCRequestException {
+        new AidaPvaRequest(channel).setter(value);
     }
 
     /**
-     * This will get a list of scalar value from the returned result structure.
-     * In AIDA-PVA CHAR_ARRAY does not exist so requests are made using
-     * BYTE_ARRAY and marshalled into CHAR_ARRAY on return
+     * Convert the results structure to a list of Objects of the desired type.
      *
-     * @param result         the result to retrieve values from
-     * @param clazz          the class to use to pull out the data.  Must extend PVField
-     * @param isForCharArray is this for the pseudo-type CHAR_ARRAY.
+     * @param result the result to retrieve values from
+     * @param clazz  the class to use to pull out the data.  Must extend PVField
      * @return the list of objects of the desired type
      */
-    static <T extends PVField> List<Object> getScalarArrayValues(PVStructure result, Class<T> clazz, boolean isForCharArray) {
+    private static <T extends PVField> List<Object> getScalarArrayValues(PVStructure result, Class<T> clazz) {
         List<Object> values = new ArrayList<>();
         T array = result.getSubField(clazz, AidaType.NT_FIELD_NAME);
-        if (PVByteArray.class.equals(clazz)) {
-            PVUtils.byteArrayIterator((PVByteArray) array, b -> values.add(isForCharArray ? "'" + (char) (b & 0xFF) + "'" : b));
-        } else {
-            PVUtils.arrayIterator(array, values::add);
-        }
+        PVUtils.arrayIterator(array, values::add);
         return values;
     }
 
@@ -144,11 +138,10 @@ public class AidaPvaClientUtils {
      * Execute the request and return the results.
      * It uses the supplied result-supplier to get the result.
      *
-     * @param supplier             the supplier of the results
-     * @param isForCharOrCharArray is for a char or char_array
+     * @param supplier the supplier of the results
      * @return the result
      */
-    static Object executeRequest(AidaGetter<PVStructure> supplier, boolean isForCharOrCharArray) throws RPCRequestException {
+    protected static Object executeRequest(AidaGetter<PVStructure> supplier) throws RPCRequestException {
         PVStructure result = supplier.get();
 
         AidaType type = AidaType.from(result);
@@ -160,9 +153,9 @@ public class AidaPvaClientUtils {
 
         switch (result.getStructure().getID()) {
             case AidaType.NTSCALAR_ID:
-                return scalarResults(clazz, isForCharOrCharArray, result);
+                return scalarResults(clazz, result);
             case AidaType.NTSCALARARRAY_ID:
-                return scalarArrayResults(result, clazz, isForCharOrCharArray);
+                return scalarArrayResults(result, clazz);
             case AidaType.NTTABLE_ID:
                 return tableResults(result);
         }
@@ -170,91 +163,82 @@ public class AidaPvaClientUtils {
     }
 
     /**
-     * Display scalar array result.  This displays one line for each array entry in a standard way
-     * for any scalar array results.
-     * It uses the supplied result-supplier to get the result so that if it gives an
-     * error, the error can be displayed in a standard way too.
-     *  @param supplier       the supplier of the results
-     * @param clazz          the class of the scalar array data that has been returned in the structure
-     * @param isForCharArray if this is for a pseudo-type CHAR_ARRAY
+     * Internal: Execute scalar array request.
+     * It uses the supplied result-supplier to get the result.
+     *
+     * @param supplier the supplier of the results
+     * @param clazz    the PVField class of the scalar array data that will be returned from the supplier
      */
-    static <T extends PVField> Object displayScalarArrayResults(AidaGetter<PVStructure> supplier, Class<T> clazz, boolean isForCharArray) throws RPCRequestException {
-        return scalarArrayResults(supplier.get(), clazz, isForCharArray);
+    private static <T extends PVField> Object executeScalarArrayRequest(AidaGetter<PVStructure> supplier, Class<T> clazz) throws RPCRequestException {
+        return scalarArrayResults(supplier.get(), clazz);
     }
 
     /**
-     * Display a scalar result.  This displays one line in a standard way for any scalar result.
-     * It uses the supplied result-supplier to get the result so that if it gives an
-     * error, the error can be displayed in a standard way too.
-     *  @param supplier  the supplier of the results
-     * @param clazz     the class of the scalar data returned in the structure
-     * @param isForChar if this is for a pseudo-type CHAR
+     * Execute a scalar request and return value.
+     * It uses the supplied result-supplier to get the result.
+     *
+     * @param supplier the supplier of the results
+     * @param clazz    the PVField class of the scalar data that will be returned from the supplier
      */
-    static <T extends PVField> Object displayScalarResult(AidaGetter<PVStructure> supplier, Class<T> clazz, boolean isForChar) throws RPCRequestException {
-        return scalarResults(clazz, isForChar, supplier.get());
+    private static <T extends PVField> Object executeScalarRequest(AidaGetter<PVStructure> supplier, Class<T> clazz) throws RPCRequestException {
+        return scalarResults(clazz, supplier.get());
     }
 
     /**
-     * Call this to run a test and display results for scalar channels with no arguments
-     *  @param query   the request
-     * @param type    the scalar type expected
+     * Internal: Call this to get a scalar channel with no arguments
+     *
+     * @param query the request
+     * @param type  the scalar type expected
      */
     private static Object getScalarRequest(final String query, AidaType type) throws RPCRequestException {
         Class<PVField> clazz = type.toPVFieldClass();
-        return displayScalarResult(
+        return executeScalarRequest(
                 () -> new AidaPvaRequest(query)
                         .returning(AidaType.valueOf(realReturnType(type)))
                         .getter(),
-                clazz, type.equals(AidaType.CHAR));
+                clazz);
     }
 
     /**
-     * Call this to run a test and display results for scalar array channels with no arguments
+     * Internal: Call this to get a scalar array channel with no arguments
      *
-     * @param query   the request
-     * @param type    the scalar array type expected
+     * @param query the request
+     * @param type  the scalar array type expected
      * @return the array value
      */
     private static <T extends PVField> Object getArrayRequest(final String query, AidaType type) throws RPCRequestException {
         Class<T> clazz = type.toPVFieldClass();
-        return displayScalarArrayResults(
+        return executeScalarArrayRequest(
                 () -> new AidaPvaRequest(query)
                         .returning(AidaType.valueOf(realReturnType(type)))
                         .getter(),
-                clazz, type.equals(AidaType.CHAR_ARRAY));
+                clazz);
     }
 
     /**
-     * Call this to run a test and display results for scalar array channels with no arguments
-     *  @param query   the request
+     * Internal: Call this to run a test and display results for scalar array channels with no arguments
      *
+     * @param query the request
      */
     private static AidaTable getTableRequest(final String query) throws RPCRequestException {
         return getTableResults(() -> new AidaPvaRequest(query).returning(AidaType.TABLE).getter());
     }
 
     /**
-     * This will get a scalar value from the returned result structure.
+     * Internal: This will get a scalar value from the returned result structure.
      * In AIDA-PVA CHAR does not exist so requests are made using BYTE and marshalled into char on return
      *
-     * @param result    the result to retrieve value from
-     * @param clazz     the class to use to pull out the data.  Must extend PVField
-     * @param isForChar is this for the pseudo-type CHAR.
+     * @param result the result to retrieve value from
+     * @param clazz  the class to use to pull out the data.  Must extend PVField
      * @return the object of the desired type
      */
-    private static <T extends PVField> Object getScalarValue(PVStructure result, Class<T> clazz, boolean isForChar) {
-        Object value = PVUtils.extractScalarValue(result.getSubField(clazz, AidaType.NT_FIELD_NAME));
-        if (value instanceof Byte && isForChar) {
-            return "'" + (char) ((Byte) value & 0xFF) + "'";
-        } else {
-            return value;
-        }
+    private static <T extends PVField> Object getScalarValue(PVStructure result, Class<T> clazz) {
+        return PVUtils.extractScalarValue(result.getSubField(clazz, AidaType.NT_FIELD_NAME));
     }
 
     /**
-     * Display a table result.  This displays tabular results in a standard way
-     * It uses the supplied result-supplier to get the result so that if it gives an
-     * error, the error can be displayed in a standard way too.
+     * Internal: Get table results.
+     * It uses the supplied result-supplier to get the result and marshal it into a AidaTable object.
      *
      * @param supplier the supplier of the results
      */
@@ -263,12 +247,12 @@ public class AidaPvaClientUtils {
     }
 
     /**
-     * To display formatted table results in a standard way
+     * Internal: To get an AidaTable from a PVStructure result object
      *
      * @param result the results to be displayed
-     * @return AidaTable a table of data
+     * @return AidaTable
      */
-    private static AidaTable tableResults(PVStructure result) {
+    static AidaTable tableResults(PVStructure result) {
         // Aida table for return
         AidaTable table = new AidaTable();
 
@@ -291,27 +275,25 @@ public class AidaPvaClientUtils {
     }
 
     /**
-     * Return scalar results
+     * Internal: Return scalar results
      *
-     * @param clazz     the class of the scalar array
-     * @param isForChar is this for a char
-     * @param result    the result
+     * @param clazz  the class of the scalar array
+     * @param result the result
      * @return Scalar Value
      */
-    private static <T extends PVField> Object scalarResults(Class<T> clazz, boolean isForChar, PVStructure result) {
-        return getScalarValue(result, clazz, isForChar);
+    private static <T extends PVField> Object scalarResults(Class<T> clazz, PVStructure result) {
+        return getScalarValue(result, clazz);
     }
 
     /**
-     * Return scalar array results
+     * Internal: Return scalar array results
      *
-     * @param result         the results
-     * @param clazz          the class of the scalar array
-     * @param isForCharArray is this for a char array
+     * @param result the results
+     * @param clazz  the class of the scalar array
      * @return Scalar array values
      */
-    private static <T extends PVField> List<Object> scalarArrayResults(PVStructure result, Class<T> clazz, boolean isForCharArray) {
-        return getScalarArrayValues(result, clazz, isForCharArray);
+    private static <T extends PVField> List<Object> scalarArrayResults(PVStructure result, Class<T> clazz) {
+        return getScalarArrayValues(result, clazz);
     }
 
     /**
@@ -325,7 +307,7 @@ public class AidaPvaClientUtils {
     }
 
     /**
-     * Determine the pseudo return type for request to be used in display
+     * Internal: Determine the pseudo return type for request to be used in display
      *
      * @param type the given AidaType
      * @return the pseudo return type

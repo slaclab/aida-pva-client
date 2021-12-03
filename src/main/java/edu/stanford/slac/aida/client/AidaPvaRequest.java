@@ -6,15 +6,14 @@
  */
 package edu.stanford.slac.aida.client;
 
-import org.epics.pvaccess.ClientFactory;
-import org.epics.pvaccess.client.rpc.RPCClientImpl;
+import org.epics.pvaClient.PvaClient;
+import org.epics.pvaClient.PvaClientChannel;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.factory.FieldFactory;
 import org.epics.pvdata.factory.PVDataFactory;
 import org.epics.pvdata.pv.*;
 
-import static org.epics.pvdata.pv.Status.StatusType.FATAL;
-import static org.epics.pvdata.pv.Status.StatusType.WARNING;
+import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
 /**
  * This is a general purpose AIDA PVA Request Executor
@@ -33,24 +32,22 @@ public class AidaPvaRequest {
     private final ArgumentBuilder argumentBuilder = new ArgumentBuilder();
 
     private final String channelName;
-    private Boolean isForChar = false;
-    private Boolean isForCharArray = false;
 
     /**
-     * Constructor
+     * Internal: Constructor
      *
      * @param channelName the request you want to get your request against
      */
-    public AidaPvaRequest(String channelName) {
+    AidaPvaRequest(String channelName) {
         this.channelName = channelName;
     }
 
     /**
-     * To add an argument to the request
+     * To add an argument to the request.
      *
      * @param name  name of argument
      * @param value to set for argument
-     * @return AidaPvaRequestExecutor
+     * @return AidaPvaRequest
      */
     public AidaPvaRequest with(String name, Object value) {
         argumentBuilder.addArgument(name, value);
@@ -58,17 +55,15 @@ public class AidaPvaRequest {
     }
 
     /**
-     * To set returning argument of the request
+     * To set return type of the request
      *
-     * @param type to set
-     * @return AidaPvaRequestExecutor
+     * @param type return type to set
+     * @return AidaPvaRequest
      */
     public AidaPvaRequest returning(AidaType type) {
         if (type.equals(AidaType.CHAR)) {
-            isForChar = true;
             type = AidaType.BYTE;
         } else if (type.equals(AidaType.CHAR_ARRAY)) {
-            isForCharArray = true;
             type = AidaType.BYTE_ARRAY;
         }
         argumentBuilder.addArgument("TYPE", type.toString());
@@ -76,26 +71,39 @@ public class AidaPvaRequest {
     }
 
     /**
-     * To set VALUE argument of the request and execute the request
+     * Set VALUE argument of the request and execute.  Exceptions are thrown to caller
      *
      * @param value to set
      */
     public void set(Object value) throws RPCRequestException {
-        argumentBuilder.addArgument("VALUE", value);
-        AidaPvaClientUtils.executeRequest(() -> setter(null), false);
+        AidaPvaClientUtils.executeRequest(() -> setter(value));
     }
 
     /**
-     * To get the query.  This will add all the arguments you've specified
-     * and then get the request
+     * Set VALUE argument of the request and execute and return the result as an
+     * AidaTable.  Exceptions are thrown to caller
+     *
+     * @param value to set
+     * @return the AidaTable
+     */
+    public AidaTable setReturningTable(Object value) throws RPCRequestException {
+        PVStructure results = (PVStructure) AidaPvaClientUtils.executeRequest(() -> setter(value));
+        return AidaTable.from(results);
+    }
+
+    /**
+     * Execute the request and return the result as an Object which can be a scalar, scalar list
+     * or AidaTable.  Exceptions are thrown to caller.
+     *
+     * @return the result of the request
      */
     public <T extends PVField> Object get() throws RPCRequestException {
-        return AidaPvaClientUtils.executeRequest(this::getter, isForChar || isForCharArray);
+        return AidaPvaClientUtils.executeRequest(this::getter);
     }
 
     /**
-     * To get the query.  This will add all the arguments you've specified
-     * and then get the request
+     * Internal: Execute the request and return the result PVStructure which can be an NTScalar,
+     * NTScalarArray or NTTable.  Exceptions are thrown to caller
      *
      * @return the result of the request
      */
@@ -104,10 +112,11 @@ public class AidaPvaRequest {
     }
 
     /**
-     * To set VALUE argument of the request and execute the request
+     * Internal: Execute the set request with the given value and return the resulting
+     * PVStructure which can an NTTable or empty.  Exceptions are thrown to caller
      *
      * @param value to set
-     * @return AidaPvaRequestExecutor
+     * @return the result of the request
      */
     PVStructure setter(Object value) throws RPCRequestException {
         if (value != null) {
@@ -117,20 +126,12 @@ public class AidaPvaRequest {
     }
 
     /**
-     * Execute a request and return the PVStructure result.  Exceptions are thrown to caller
+     * Internal: Execute a request and return the PVStructure result.  Exceptions are thrown to caller
      *
      * @return the PVStructure result
-     * @throws RPCRequestException if there is an error calling the request
+     * @throws RPCRequestException if there is an error making the request
      */
     private PVStructure execute() throws RPCRequestException {
-        ClientFactory.start();
-        RPCClientImpl client = null;
-        try {
-            client = new RPCClientImpl(channelName);
-        } catch (Exception e) {
-            throw new RPCRequestException(FATAL, e.getMessage(), e);
-        }
-
         // Build the arguments structure
         Structure arguments = argumentBuilder.build();
 
@@ -152,13 +153,12 @@ public class AidaPvaRequest {
         argumentBuilder.initializeQuery(query);
 
         // Execute the query
-        PVStructure result = client.request(request, 3.0);
         try {
-            client.destroy();
-            ClientFactory.stop();
+            PvaClient client = PvaClient.get("pva");
+            PvaClientChannel channel = client.createChannel(channelName);
+            return channel.rpc(request);
         } catch (Exception e) {
-            throw new RPCRequestException(WARNING, e.getMessage(), e);
+            throw new RPCRequestException(ERROR, e.getMessage(), e);
         }
-        return result;
     }
 }
