@@ -65,7 +65,7 @@ public class AidaClientTest {
             System.out.println("Test for request().get() - AidaTable");
             AidaTable table = (AidaTable) request("KLYS:LI31:31:TACT")
                     .with("BEAM", 8)
-                    .with("DGRP", "DEV_GRP")
+                    .with("DGRP", "DEV_DGRP")
                     .returning(TABLE)
                     .get();
             assertEquals(false, table.getValues().get("accel").get(0));
