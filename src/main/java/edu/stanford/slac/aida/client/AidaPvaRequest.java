@@ -158,6 +158,7 @@ public class AidaPvaRequest {
             PvaClientChannel channel = client.createChannel(channelName);
             return channel.rpc(request);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RPCRequestException(ERROR, e.getMessage(), e);
         }
     }
