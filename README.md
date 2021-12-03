@@ -1,7 +1,7 @@
 # aida-pva-client
-## AIDA-PVA Client Library
+Client utility class to facilitate running AIDA-PVA requests.  For more 
+information on AIDA-PVA see [AIDA-PVA documentation](https://www.slac.stanford.edu/grp/cd/soft/aida/aida-pva/).
 
-Client utility class to facilitate running AIDA-PVA requests.
 ## Details
 In order to write a query it is very easy.
 
