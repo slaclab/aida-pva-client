@@ -97,12 +97,12 @@ public class AidaClientTest {
     void test7() {
         try {
             System.out.println("Test for get Errors");
-            request("XCOR:LI31:41:BCON")
-                    .returning(TABLE)
+            request("XCOR:LI31:4100:BCON")
+                    .returning(FLOAT)
                     .get();
-            fail("Request XCOR:LI31:10000:BCON, TYPE=TABLE, should have failed");
+            fail("Request XCOR:LI31:4100:BCON, TYPE=FLOAT, should have failed");
         } catch (RPCRequestException e) {
-            assertEquals("XCOR:LI31:41:BCON:  TABLE_TYPE is not a valid argument for get requests to this channel", abbreviate(e.getMessage()));
+            assertEquals("Error:  Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
         }
     }
 
