@@ -6,14 +6,14 @@
  */
 package edu.stanford.slac.aida.client;
 
-import org.epics.pvaClient.PvaClient;
-import org.epics.pvaClient.PvaClientChannel;
+import org.epics.pvaccess.ClientFactory;
+import org.epics.pvaccess.client.rpc.RPCClientImpl;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.factory.FieldFactory;
 import org.epics.pvdata.factory.PVDataFactory;
 import org.epics.pvdata.pv.*;
 
-import static org.epics.pvdata.pv.Status.StatusType.ERROR;
+import static org.epics.pvdata.pv.Status.StatusType.FATAL;
 import static org.epics.pvdata.pv.Status.StatusType.WARNING;
 
 /**
@@ -88,11 +88,7 @@ public class AidaPvaRequest {
      * @return the AidaTable
      */
     public AidaTable setReturningTable(Object value) throws RPCRequestException {
-        AidaTable results = (AidaTable)AidaPvaClientUtils.executeRequest(() -> setter(value));
-        if ( results == null) {
-            throw new RPCRequestException(ERROR, "Error setting value.  Expected TABLE but received nothing");
-        }
-        return results;
+        return (AidaTable)AidaPvaClientUtils.executeRequest(() -> setter(value));
     }
 
     /**
@@ -136,6 +132,14 @@ public class AidaPvaRequest {
      * @throws RPCRequestException if there is an error making the request
      */
     private PVStructure execute() throws RPCRequestException {
+        ClientFactory.start();
+        RPCClientImpl client = null;
+        try {
+            client = new RPCClientImpl(channelName);
+        } catch (Exception e) {
+            throw new RPCRequestException(FATAL, e.getMessage(), e);
+        }
+
         // Build the arguments structure
         Structure arguments = argumentBuilder.build();
 
@@ -157,16 +161,13 @@ public class AidaPvaRequest {
         argumentBuilder.initializeQuery(query);
 
         // Execute the query
+        PVStructure result = client.request(request, 3.0);
         try {
-            PvaClient client = PvaClient.get("pva");
-            PvaClientChannel channel = client.createChannel(channelName);
-            PVStructure result = channel.rpc(request);
-            if ( result == null ) {
-                throw new RPCRequestException(ERROR, "Unspecified error executing request");
-            }
-            return result;
+            client.destroy();
+            ClientFactory.stop();
         } catch (Exception e) {
-            throw new RPCRequestException(ERROR, e.getMessage(), e);
+            throw new RPCRequestException(WARNING, e.getMessage(), e);
         }
+        return result;
     }
 }
