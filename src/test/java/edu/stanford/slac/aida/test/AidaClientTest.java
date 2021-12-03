@@ -103,7 +103,6 @@ public class AidaClientTest {
                     .get();
             fail("Request XCOR:LI31:10000:BCON, TYPE=TABLE, should have failed");
         } catch (RPCRequestException e) {
-            e.printStackTrace();
             assertEquals("Unspecified error executing request", e.getMessage());
         }
     }
@@ -115,7 +114,6 @@ public class AidaClientTest {
             setRequest("XCOR:LI31:41:BCON", "FOO");
             fail("Setting XCOR:LI31:41:BCON, to \"FOO\" should have failed");
         } catch (RPCRequestException e) {
-            e.printStackTrace();
             assertEquals("Unspecified error executing request", e.getMessage());
         }
     }
