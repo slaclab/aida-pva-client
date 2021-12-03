@@ -88,11 +88,11 @@ public class AidaPvaRequest {
      * @return the AidaTable
      */
     public AidaTable setReturningTable(Object value) throws RPCRequestException {
-        PVStructure results = (PVStructure) AidaPvaClientUtils.executeRequest(() -> setter(value));
-        if ( results == null ) {
+        AidaTable results = (AidaTable)AidaPvaClientUtils.executeRequest(() -> setter(value));
+        if ( results == null) {
             throw new RPCRequestException(ERROR, "Error setting value.  Expected TABLE but received nothing");
         }
-        return AidaTable.from(results);
+        return results;
     }
 
     /**
