@@ -62,11 +62,19 @@ public class AidaClientTest {
     @Test
     void test5() {
         try {
-            System.out.println("Test for request().setReturningTable() - AidaTable");
-            AidaTable table = request("TRIG:LI31:109:TACT")
-                    .with("BEAM", 1)
-                    .setReturningTable(0);
-            assertEquals(0, table.getValues().get("status").get(0));
+            System.out.println("Test for request().get() - AidaTable");
+            AidaTable table = (AidaTable) request("KLYS:LI31:31:TACT")
+                    .with("BEAM", 8)
+                    .with("DGRP", "DEV_GRP")
+                    .returning(TABLE)
+                    .get();
+            assertEquals(false, table.getValues().get("accel").get(0));
+            assertEquals(true, table.getValues().get("standby").get(0));
+            assertEquals(false, table.getValues().get("bad").get(0));
+            assertEquals(false, table.getValues().get("sled").get(0));
+            assertEquals(true, table.getValues().get("sleded").get(0));
+            assertEquals(false, table.getValues().get("pampl").get(0));
+            assertEquals(false, table.getValues().get("pphas").get(0));
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
@@ -74,6 +82,19 @@ public class AidaClientTest {
 
     @Test
     void test6() {
+        try {
+            System.out.println("Test for request().setReturningTable() - AidaTable");
+            AidaTable table = request("KLYS:LI31:31:PDES")
+                    .with("TRIM", "NO")
+                    .setReturningTable(90.0f);
+            assertEquals(0, table.getValues().get("PHAS").get(0));
+        } catch (RPCRequestException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void test7() {
         try {
             System.out.println("Test for get Errors");
             request("XCOR:LI31:41:BCON")
@@ -83,19 +104,19 @@ public class AidaClientTest {
             fail("Request XCOR:LI31:10000:BCON, TYPE=TABLE, should have failed");
         } catch (RPCRequestException e) {
             e.printStackTrace();
-            assertEquals("Error: XCOR:LI31:41:BCON:  TABLE_TYPE is not a valid argument for get requests to this channel.  No arguments are allowed", e.getMessage());
+            assertEquals("Unspecified error executing request", e.getMessage());
         }
     }
 
     @Test
-    void test7() {
+    void test8() {
         try {
             System.out.println("Test for set Errors");
             setRequest("XCOR:LI31:41:BCON", "FOO");
             fail("Setting XCOR:LI31:41:BCON, to \"FOO\" should have failed");
         } catch (RPCRequestException e) {
             e.printStackTrace();
-            assertEquals("Error: AidaInternalException; can't convert argument \"FOO\" to float", e.getMessage());
+            assertEquals("Unspecified error executing request", e.getMessage());
         }
     }
 }

@@ -162,7 +162,7 @@ public class AidaPvaRequest {
             PvaClientChannel channel = client.createChannel(channelName);
             PVStructure result = channel.rpc(request);
             if ( result == null ) {
-                throw new RPCRequestException(WARNING, "Nothing received from request");
+                throw new RPCRequestException(ERROR, "Unspecified error executing request");
             }
             return result;
         } catch (Exception e) {
