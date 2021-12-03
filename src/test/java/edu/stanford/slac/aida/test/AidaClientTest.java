@@ -68,6 +68,7 @@ public class AidaClientTest {
                     .setReturningTable(0);
             assertEquals(0, table.getValues().get("status").get(0));
         } catch (RPCRequestException e) {
+            e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -82,6 +83,7 @@ public class AidaClientTest {
                     .get();
             fail("Request XCOR:LI31:10000:BCON, TYPE=TABLE, should have failed");
         } catch (RPCRequestException e) {
+            e.printStackTrace();
             assertEquals("Error: XCOR:LI31:41:BCON:  TABLE_TYPE is not a valid argument for get requests to this channel.  No arguments are allowed", e.getMessage());
         }
     }
@@ -93,6 +95,7 @@ public class AidaClientTest {
             setRequest("XCOR:LI31:41:BCON", "FOO");
             fail("Setting XCOR:LI31:41:BCON, to \"FOO\" should have failed");
         } catch (RPCRequestException e) {
+            e.printStackTrace();
             assertEquals("Error: AidaInternalException; can't convert argument \"FOO\" to float", e.getMessage());
         }
     }
