@@ -14,6 +14,7 @@ import org.epics.pvdata.factory.PVDataFactory;
 import org.epics.pvdata.pv.*;
 
 import static org.epics.pvdata.pv.Status.StatusType.ERROR;
+import static org.epics.pvdata.pv.Status.StatusType.WARNING;
 
 /**
  * This is a general purpose AIDA PVA Request Executor
@@ -88,6 +89,9 @@ public class AidaPvaRequest {
      */
     public AidaTable setReturningTable(Object value) throws RPCRequestException {
         PVStructure results = (PVStructure) AidaPvaClientUtils.executeRequest(() -> setter(value));
+        if ( results == null ) {
+            throw new RPCRequestException(ERROR, "Error setting value.  Expected TABLE but received nothing");
+        }
         return AidaTable.from(results);
     }
 
@@ -156,9 +160,12 @@ public class AidaPvaRequest {
         try {
             PvaClient client = PvaClient.get("pva");
             PvaClientChannel channel = client.createChannel(channelName);
-            return channel.rpc(request);
+            PVStructure result = channel.rpc(request);
+            if ( result == null ) {
+                throw new RPCRequestException(WARNING, "Nothing received from request");
+            }
+            return result;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RPCRequestException(ERROR, e.getMessage(), e);
         }
     }
