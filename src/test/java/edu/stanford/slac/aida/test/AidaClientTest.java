@@ -102,7 +102,7 @@ public class AidaClientTest {
                     .get();
             fail("Request XCOR:LI31:4100:BCON, TYPE=FLOAT, should have failed");
         } catch (RPCRequestException e) {
-            assertEquals("Error:  Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
+            assertEquals(" Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
         }
     }
 
