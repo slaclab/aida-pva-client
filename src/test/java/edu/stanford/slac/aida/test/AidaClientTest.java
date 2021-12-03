@@ -87,7 +87,7 @@ public class AidaClientTest {
             AidaTable table = request("KLYS:LI31:31:PDES")
                     .with("TRIM", "NO")
                     .setReturningTable(90.0f);
-            assertEquals(0, table.getValues().get("PHAS").get(0));
+            assertEquals(0.0f, table.getValues().get("PHAS").get(0));
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
