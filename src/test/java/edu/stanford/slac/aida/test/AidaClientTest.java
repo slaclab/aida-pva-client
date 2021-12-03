@@ -99,12 +99,10 @@ public class AidaClientTest {
             System.out.println("Test for get Errors");
             request("XCOR:LI31:41:BCON")
                     .returning(TABLE)
-                    .with("TABLE_TYPE", "SHORT")
                     .get();
             fail("Request XCOR:LI31:10000:BCON, TYPE=TABLE, should have failed");
         } catch (RPCRequestException e) {
-            System.out.println(":::::" + e.getMessage() + ":::::");
-            assertEquals("XCOR:LI31:41:BCON:  TABLE_TYPE is not a valid argument for get requests to this channel.  No arguments are allowed, cause", e.getMessage());
+            assertEquals("XCOR:LI31:41:BCON:  TABLE_TYPE is not a valid argument for get requests to this channel", abbreviate(e.getMessage()));
         }
     }
 
@@ -115,8 +113,19 @@ public class AidaClientTest {
             setRequest("XCOR:LI31:41:BCON", "FOO");
             fail("Setting XCOR:LI31:41:BCON, to \"FOO\" should have failed");
         } catch (RPCRequestException e) {
-            assertEquals("AidaInternalException; can't convert argument \"FOO\" to float, cause:\n" +
-                    "org.epics.pvaccess.server.rpc.RPCRequestException: AidaInternalException; can't convert argument \"FOO\" to float", e.getMessage());
+            assertEquals("AidaInternalException; can't convert argument \"FOO\" to float", abbreviate(e.getMessage()));
         }
+    }
+
+    private String abbreviate(String message) {
+        int end = message.indexOf(".");
+        int endC = message.indexOf(", cause:");
+        if ( end == -1 ) {
+            return message;
+        }
+        if ( endC == -1 ) {
+            endC = end;
+        }
+        return message.substring(0,Math.min(end, endC));
     }
 }
