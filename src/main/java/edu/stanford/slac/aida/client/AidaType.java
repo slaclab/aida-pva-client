@@ -124,6 +124,10 @@ public enum AidaType {
      * @return the AidaType corresponding to the given @p pvStructure
      */
     public static AidaType from(PVStructure pvStructure) {
+        if ( pvStructure == null ) {
+            return VOID;
+        }
+
         return from(pvStructure, NT_FIELD_NAME);
     }
 
