@@ -45,6 +45,13 @@
             <artifactId>epics-pvaclient</artifactId>
             <version>4.3.2</version>
         </dependency>
+<!--
+        <dependency>
+            <groupId>epics</groupId>
+            <artifactId>easyPVAJava</artifactId>
+            <version>0.2.2</version>
+        </dependency>
+-->
     </dependencies>
 
     <build>

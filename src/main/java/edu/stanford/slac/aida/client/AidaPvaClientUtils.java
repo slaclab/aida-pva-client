@@ -17,6 +17,9 @@
  */
 package edu.stanford.slac.aida.client;
 
+import edu.stanford.slac.aida.client.impl.EasyPvaRequestExecutor;
+import edu.stanford.slac.aida.client.impl.PojoRequestExecutor;
+import edu.stanford.slac.aida.client.impl.PvaClientRequestExecutor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.pv.PVField;
@@ -26,6 +29,7 @@ import org.epics.pvdata.pv.PVStructure;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -73,14 +77,34 @@ import java.util.stream.Collectors;
  * @noop @formatter:on
  */
 public class AidaPvaClientUtils {
+    private static final Logger logger = Logger.getLogger(AidaPvaClientUtils.class.getName());
 
-    /**
-     * Change here for whatever implementation we require for the executor.  Pojo, PvaClient, or ExPva
-     *
-     * @return the chosen request executor
-     */
-    private static PvaRequestExecutor requestExecutor() {
-        return PvaClientPvaRequest::executeRequest;
+    private final static String DEFAULT_AIDA_PVA_CLIENT_REQUEST_EXECUTOR = "pojo";
+
+    private static final PvaRequestExecutor pvaRequestExecutor;
+
+    static {
+        // Get pva Request Executor property (commandline or resource file).
+        String requestExecutorName = System.getProperty("aida.pva.client.request.executor", DEFAULT_AIDA_PVA_CLIENT_REQUEST_EXECUTOR);
+
+        // Override with the environment variable if it is set
+        String aidaPvaRequestExecutorEnv = System.getenv("AIDA_PVA_CLIENT_REQUEST_EXECUTOR");
+        if (aidaPvaRequestExecutorEnv != null) {
+            requestExecutorName = aidaPvaRequestExecutorEnv;
+        }
+
+        // If we've overridden the default name then log it to the console
+        if (!requestExecutorName.equals(DEFAULT_AIDA_PVA_CLIENT_REQUEST_EXECUTOR)) {
+            logger.info("Request Executor: " + requestExecutorName);
+        }
+
+        if (requestExecutorName.equalsIgnoreCase("pvaclient")) {
+            pvaRequestExecutor = PvaClientRequestExecutor::executeRequest;
+        } else if (requestExecutorName.equalsIgnoreCase("easypva")) {
+            pvaRequestExecutor = EasyPvaRequestExecutor::executeRequest;
+        } else {
+            pvaRequestExecutor = PojoRequestExecutor::executeRequest;
+        }
     }
 
     /**
@@ -91,7 +115,7 @@ public class AidaPvaClientUtils {
      * @return An AidaPvaRequest that can be further configured before calling get() or set()
      */
     public static AidaPvaRequest request(final String query) {
-        return new AidaPvaRequest(requestExecutor(), query);
+        return new AidaPvaRequest(pvaRequestExecutor, query);
     }
 
     /**
@@ -118,7 +142,7 @@ public class AidaPvaClientUtils {
      * @param value   the value to set
      */
     public static void setRequest(final String channel, Object value) throws RPCRequestException {
-        new AidaPvaRequest(requestExecutor(), channel).setter(value);
+        new AidaPvaRequest(pvaRequestExecutor, channel).setter(value);
     }
 
     /**
@@ -194,7 +218,7 @@ public class AidaPvaClientUtils {
     private static Object getScalarRequest(final String query, AidaType type) throws RPCRequestException {
         Class<PVField> clazz = type.toPVFieldClass();
         return executeScalarRequest(
-                () -> new AidaPvaRequest(requestExecutor(), query)
+                () -> new AidaPvaRequest(pvaRequestExecutor, query)
                         .returning(AidaType.valueOf(realReturnType(type)))
                         .getter(),
                 clazz);
@@ -210,7 +234,7 @@ public class AidaPvaClientUtils {
     private static <T extends PVField> Object getArrayRequest(final String query, AidaType type) throws RPCRequestException {
         Class<T> clazz = type.toPVFieldClass();
         return executeScalarArrayRequest(
-                () -> new AidaPvaRequest(requestExecutor(), query)
+                () -> new AidaPvaRequest(pvaRequestExecutor, query)
                         .returning(AidaType.valueOf(realReturnType(type)))
                         .getter(),
                 clazz);
@@ -222,7 +246,7 @@ public class AidaPvaClientUtils {
      * @param query the request
      */
     private static AidaTable getTableRequest(final String query) throws RPCRequestException {
-        return getTableResults(() -> new AidaPvaRequest(requestExecutor(), query).returning(AidaType.TABLE).getter());
+        return getTableResults(() -> new AidaPvaRequest(pvaRequestExecutor, query).returning(AidaType.TABLE).getter());
     }
 
     /**

@@ -1,4 +1,4 @@
-package edu.stanford.slac.aida.client;
+package edu.stanford.slac.aida.client.impl;
 
 import org.epics.pvaccess.ClientFactory;
 import org.epics.pvaccess.client.rpc.RPCClientImpl;
@@ -8,8 +8,8 @@ import org.epics.pvdata.pv.PVStructure;
 import static org.epics.pvdata.pv.Status.StatusType.FATAL;
 import static org.epics.pvdata.pv.Status.StatusType.WARNING;
 
-class PojoPvaRequest {
-    static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
+public class PojoRequestExecutor {
+    public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         ClientFactory.start();
         RPCClientImpl client;
         try {
