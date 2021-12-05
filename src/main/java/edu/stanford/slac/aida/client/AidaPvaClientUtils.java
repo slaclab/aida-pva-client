@@ -18,7 +18,7 @@
 package edu.stanford.slac.aida.client;
 
 import edu.stanford.slac.aida.client.impl.EasyPvaRequestExecutor;
-import edu.stanford.slac.aida.client.impl.PojoRequestExecutor;
+import edu.stanford.slac.aida.client.impl.PvAcccessRequestExecutor;
 import edu.stanford.slac.aida.client.impl.PvaClientRequestExecutor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
@@ -79,7 +79,7 @@ import java.util.stream.Collectors;
 public class AidaPvaClientUtils {
     private static final Logger logger = Logger.getLogger(AidaPvaClientUtils.class.getName());
 
-    private final static String DEFAULT_AIDA_PVA_CLIENT_REQUEST_EXECUTOR = "pojo";
+    private final static String DEFAULT_AIDA_PVA_CLIENT_REQUEST_EXECUTOR = "PvAccess";
 
     private static final PvaRequestExecutor pvaRequestExecutor;
 
@@ -98,12 +98,12 @@ public class AidaPvaClientUtils {
             logger.info("Request Executor: " + requestExecutorName);
         }
 
-        if (requestExecutorName.equalsIgnoreCase("pvaclient")) {
+        if (requestExecutorName.equalsIgnoreCase("PvaClient")) {
             pvaRequestExecutor = PvaClientRequestExecutor::executeRequest;
-        } else if (requestExecutorName.equalsIgnoreCase("easypva")) {
+        } else if (requestExecutorName.equalsIgnoreCase("EasyPva")) {
             pvaRequestExecutor = EasyPvaRequestExecutor::executeRequest;
         } else {
-            pvaRequestExecutor = PojoRequestExecutor::executeRequest;
+            pvaRequestExecutor = PvAcccessRequestExecutor::executeRequest;
         }
     }
 

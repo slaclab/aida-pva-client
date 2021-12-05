@@ -8,7 +8,7 @@ import org.epics.pvdata.pv.PVStructure;
 import static org.epics.pvdata.pv.Status.StatusType.FATAL;
 import static org.epics.pvdata.pv.Status.StatusType.WARNING;
 
-public class PojoRequestExecutor {
+public class PvAcccessRequestExecutor {
     public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         ClientFactory.start();
         RPCClientImpl client;
