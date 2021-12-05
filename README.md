@@ -30,16 +30,22 @@ In order to write a query it is very easy.
  setRequest("XCOR:LI31:41:BCON", 5.0f);
 ```
 
-### e.g. 4: Advanced set
+### e.g. 4: Alternative simple set
+
+```java
+ request("XCOR:LI31:41:BCON").set(5.0f);
+```
+
+### e.g. 5: Advanced set
 ```java
  Short status = ((AidaTable)request("KLYS:LI31:31:TACT")
      .with("BEAM", 8)
      .with("DGRP", "DEV_DGRP")
      .setReturningTable(0)
-     ).getValues().get("status").get(0);
+     ).getValues().setReturningTable("status").get(0);
 ```
 
-### e.g. 5: Selecting the return value type
+### e.g. 6: Selecting the return value type
 
 ```java
 String value = request("KLYS:LI31:31:TACT")

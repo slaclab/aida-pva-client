@@ -6,15 +6,10 @@
  */
 package edu.stanford.slac.aida.client;
 
-import org.epics.pvaccess.ClientFactory;
-import org.epics.pvaccess.client.rpc.RPCClientImpl;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.factory.FieldFactory;
 import org.epics.pvdata.factory.PVDataFactory;
 import org.epics.pvdata.pv.*;
-
-import static org.epics.pvdata.pv.Status.StatusType.FATAL;
-import static org.epics.pvdata.pv.Status.StatusType.WARNING;
 
 /**
  * This is a general purpose AIDA PVA Request Executor
@@ -32,14 +27,24 @@ public class AidaPvaRequest {
      */
     private final ArgumentBuilder argumentBuilder = new ArgumentBuilder();
 
+    /**
+     * The request executor implementation
+     */
+    private final PvaRequestExecutor requestExecutor;
+
+    /**
+     * The channel name
+     */
     private final String channelName;
 
     /**
      * Internal: Constructor
      *
-     * @param channelName the request you want to get your request against
+     * @param requestExecutor the request executor implementation
+     * @param channelName     the request you want to get your request against
      */
-    AidaPvaRequest(String channelName) {
+    AidaPvaRequest(PvaRequestExecutor requestExecutor, String channelName) {
+        this.requestExecutor = requestExecutor;
         this.channelName = channelName;
     }
 
@@ -88,7 +93,7 @@ public class AidaPvaRequest {
      * @return the AidaTable
      */
     public AidaTable setReturningTable(Object value) throws RPCRequestException {
-        return (AidaTable)AidaPvaClientUtils.executeRequest(() -> setter(value));
+        return (AidaTable) AidaPvaClientUtils.executeRequest(() -> setter(value));
     }
 
     /**
@@ -97,7 +102,7 @@ public class AidaPvaRequest {
      *
      * @return the result of the request
      */
-    public <T extends PVField> Object get() throws RPCRequestException {
+    public Object get() throws RPCRequestException {
         return AidaPvaClientUtils.executeRequest(this::getter);
     }
 
@@ -132,14 +137,6 @@ public class AidaPvaRequest {
      * @throws RPCRequestException if there is an error making the request
      */
     private PVStructure execute() throws RPCRequestException {
-        ClientFactory.start();
-        RPCClientImpl client = null;
-        try {
-            client = new RPCClientImpl(channelName);
-        } catch (Exception e) {
-            throw new RPCRequestException(FATAL, e.getMessage(), e);
-        }
-
         // Build the arguments structure
         Structure arguments = argumentBuilder.build();
 
@@ -161,13 +158,6 @@ public class AidaPvaRequest {
         argumentBuilder.initializeQuery(query);
 
         // Execute the query
-        PVStructure result = client.request(request, 3.0);
-        try {
-            client.destroy();
-            ClientFactory.stop();
-        } catch (Exception e) {
-            throw new RPCRequestException(WARNING, e.getMessage(), e);
-        }
-        return result;
+        return requestExecutor.executeRequest(channelName, request);
     }
 }

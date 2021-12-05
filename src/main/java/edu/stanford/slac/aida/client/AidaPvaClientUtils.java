@@ -73,13 +73,14 @@ import java.util.stream.Collectors;
  * @noop @formatter:on
  */
 public class AidaPvaClientUtils {
+
     /**
-     * This functional interface is the similar to a Supplier except that
-     * we throw RPCRequestExceptions for errors and always return PVStructures
+     * Change here for whatever implementation we require for the executor.  Pojo, PvaClient, or ExPva
+     *
+     * @return the chosen request executor
      */
-    @FunctionalInterface
-    public interface AidaGetter<T extends PVStructure> {
-        T get() throws RPCRequestException;
+    private static PvaRequestExecutor requestExecutor() {
+        return PvaClientPvaRequest::executeRequest;
     }
 
     /**
@@ -90,14 +91,14 @@ public class AidaPvaClientUtils {
      * @return An AidaPvaRequest that can be further configured before calling get() or set()
      */
     public static AidaPvaRequest request(final String query) {
-        return new AidaPvaRequest(query);
+        return new AidaPvaRequest(requestExecutor(), query);
     }
 
     /**
      * Call a channel getter with no arguments
      *
      * @param channel the channel
-     * @param type  the type expected
+     * @param type    the type expected
      */
     public static Object getRequest(final String channel, AidaType type) throws RPCRequestException {
         String stringType = type.toString();
@@ -114,10 +115,10 @@ public class AidaPvaClientUtils {
      * Call a channel setter with the given value.
      *
      * @param channel the channel
-     * @param value the value to set
+     * @param value   the value to set
      */
     public static void setRequest(final String channel, Object value) throws RPCRequestException {
-        new AidaPvaRequest(channel).setter(value);
+        new AidaPvaRequest(requestExecutor(), channel).setter(value);
     }
 
     /**
@@ -193,7 +194,7 @@ public class AidaPvaClientUtils {
     private static Object getScalarRequest(final String query, AidaType type) throws RPCRequestException {
         Class<PVField> clazz = type.toPVFieldClass();
         return executeScalarRequest(
-                () -> new AidaPvaRequest(query)
+                () -> new AidaPvaRequest(requestExecutor(), query)
                         .returning(AidaType.valueOf(realReturnType(type)))
                         .getter(),
                 clazz);
@@ -209,7 +210,7 @@ public class AidaPvaClientUtils {
     private static <T extends PVField> Object getArrayRequest(final String query, AidaType type) throws RPCRequestException {
         Class<T> clazz = type.toPVFieldClass();
         return executeScalarArrayRequest(
-                () -> new AidaPvaRequest(query)
+                () -> new AidaPvaRequest(requestExecutor(), query)
                         .returning(AidaType.valueOf(realReturnType(type)))
                         .getter(),
                 clazz);
@@ -221,7 +222,7 @@ public class AidaPvaClientUtils {
      * @param query the request
      */
     private static AidaTable getTableRequest(final String query) throws RPCRequestException {
-        return getTableResults(() -> new AidaPvaRequest(query).returning(AidaType.TABLE).getter());
+        return getTableResults(() -> new AidaPvaRequest(requestExecutor(), query).returning(AidaType.TABLE).getter());
     }
 
     /**
@@ -304,16 +305,6 @@ public class AidaPvaClientUtils {
      */
     private static String realReturnType(AidaType type) {
         return type.equals(AidaType.CHAR_ARRAY) ? "BYTE_ARRAY" : type.equals(AidaType.CHAR) ? "BYTE" : type.toString();
-    }
-
-    /**
-     * Internal: Determine the pseudo return type for request to be used in display
-     *
-     * @param type the given AidaType
-     * @return the pseudo return type
-     */
-    private static String pseudoReturnType(AidaType type) {
-        return type.equals(AidaType.CHAR_ARRAY) ? "CHAR_ARRAY" : type.equals(AidaType.CHAR) ? "CHAR" : realReturnType(type);
     }
 }
 
