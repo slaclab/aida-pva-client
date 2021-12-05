@@ -23,6 +23,7 @@ public class AidaClientTest {
                     .returning(INTEGER)
                     .get();
             assertEquals(16800, response);
+            System.out.println("get: XCOR:LI31:41:BCON: returned: " + response);
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
@@ -34,6 +35,7 @@ public class AidaClientTest {
             System.out.println("Test for getRequest() - Integer");
             Integer response = (Integer) getRequest("XCOR:LI31:41:BCON", INTEGER);
             assertEquals(16800, response);
+            System.out.println("getRequest: XCOR:LI31:41:BCON: returned: " + response);
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
@@ -44,6 +46,7 @@ public class AidaClientTest {
         try {
             System.out.println("Test for request().set() - void");
             request("XCOR:LI31:41:BCON").set(5.0);
+            System.out.println("set: XCOR:LI31:41:BCON = 5.0: returned: successfully");
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
@@ -54,6 +57,7 @@ public class AidaClientTest {
         try {
             System.out.println("Test for setRequest() - void");
             setRequest("XCOR:LI31:41:BCON", 5.0);
+            System.out.println("setRequest: XCOR:LI31:41:BCON = 5.0: returned: successfully");
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
@@ -75,6 +79,7 @@ public class AidaClientTest {
             assertEquals(true, table.getValues().get("sleded").get(0));
             assertEquals(false, table.getValues().get("pampl").get(0));
             assertEquals(false, table.getValues().get("pphas").get(0));
+            System.out.println("get: KLYS:LI31:31:TACT(BEAM=8,DGRP=DEV_DGRP): returned: " + table);
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
@@ -88,6 +93,7 @@ public class AidaClientTest {
                     .with("TRIM", "NO")
                     .setReturningTable(90.0f);
             assertEquals(0.0f, table.getValues().get("PHAS").get(0));
+            System.out.println("set: KLYS:LI31:31:PDES = 0: returned: " + table);
         } catch (RPCRequestException e) {
             fail(e.getMessage());
         }
@@ -103,6 +109,7 @@ public class AidaClientTest {
             fail("Request XCOR:LI31:4100:BCON, TYPE=FLOAT, should have failed");
         } catch (RPCRequestException e) {
             assertEquals(" Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
+            System.out.println("get: XCOR:LI31:4100:BCON: failed as expected:" + abbreviate(e.getMessage()) );
         }
     }
 
@@ -114,6 +121,7 @@ public class AidaClientTest {
             fail("Setting XCOR:LI31:41:BCON, to \"FOO\" should have failed");
         } catch (RPCRequestException e) {
             assertEquals("AidaInternalException; can't convert argument \"FOO\" to float", abbreviate(e.getMessage()));
+            System.out.println("setRequest: XCOR:LI31:41:BCON = FOO: failed as expected:" + abbreviate(e.getMessage()) );
         }
     }
 
