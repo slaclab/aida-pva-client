@@ -106,7 +106,7 @@ public class AidaClientTest {
             request("XCOR:LI31:4100:BCON")
                     .returning(FLOAT)
                     .get();
-            fail("Request XCOR:LI31:4100:BCON, TYPE=FLOAT, should have failed");
+            fail("get: XCOR:LI31:4100:BCON: should have failed");
         } catch (RPCRequestException e) {
             assertEquals(" Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
             System.out.println("get: XCOR:LI31:4100:BCON: failed as expected:" + abbreviate(e.getMessage()) );
@@ -118,7 +118,7 @@ public class AidaClientTest {
         try {
             System.out.println("Test for set Errors");
             setRequest("XCOR:LI31:41:BCON", "FOO");
-            fail("Setting XCOR:LI31:41:BCON, to \"FOO\" should have failed");
+            fail("setRequest: XCOR:LI31:41:BCON = FOO: should have failed");
         } catch (RPCRequestException e) {
             assertEquals("AidaInternalException; can't convert argument \"FOO\" to float", abbreviate(e.getMessage()));
             System.out.println("setRequest: XCOR:LI31:41:BCON = FOO: failed as expected:" + abbreviate(e.getMessage()) );
