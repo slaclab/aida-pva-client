@@ -16,21 +16,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class AidaClientTest {
     @Test
-    void test01() {
-        try {
-            System.out.println("Test for request().returning(INTEGER).get() - Integer");
-            Integer response = (Integer) request("XCOR:LI31:41:BCON")
-                    .returning(INTEGER)
-                    .get();
-            assertEquals(16800, response);
-            System.out.println("get: XCOR:LI31:41:BCON: returned: " + response);
-        } catch (RPCRequestException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    void test02() {
+    void test1() {
         try {
             System.out.println("Test for request().returning(INTEGER).get() - Integer");
             Integer response = (Integer) request("XCOR:LI31:41:BCON")
