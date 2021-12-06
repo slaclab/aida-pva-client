@@ -30,7 +30,7 @@ public class PvAcccessRequestExecutor {
             ChannelGetRequesterImpl channelGetRequester = new ChannelGetRequesterImpl(doneSignal);
             channel.createChannelGet(channelGetRequester, request);
 
-            if (doneSignal.await(3, SECONDS)) {
+            if (doneSignal.await(10, SECONDS)) {
                 throw new RPCRequestException(ERROR, "Failed to get value (timeout condition).");
             }
             ClientFactory.stop();
