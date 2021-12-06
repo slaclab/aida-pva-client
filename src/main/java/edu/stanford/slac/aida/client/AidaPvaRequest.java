@@ -11,6 +11,8 @@ import org.epics.pvdata.factory.FieldFactory;
 import org.epics.pvdata.factory.PVDataFactory;
 import org.epics.pvdata.pv.*;
 
+import static org.epics.pvdata.pv.Status.StatusType.ERROR;
+
 /**
  * This is a general purpose AIDA PVA Request Executor
  * It follows the builder pattern for maximum configurability
@@ -158,6 +160,29 @@ public class AidaPvaRequest {
         argumentBuilder.initializeQuery(query);
 
         // Execute the query
-        return requestExecutor.executeRequest(channelName, request);
+        try {
+            return requestExecutor.executeRequest(channelName, request);
+        } catch (RPCRequestException e) {
+            throw new RPCRequestException(ERROR, abbreviate(e.getMessage()));
+        }
     }
+
+    /**
+     * Show an abbreviated version of the error message
+     *
+     * @param message the error message
+     * @return abbreviated version of the given message
+     */
+    static String abbreviate(String message) {
+        int end = message.indexOf(".");
+        int endC = message.indexOf(", cause:");
+        if (end == -1) {
+            return message;
+        }
+        if (endC == -1) {
+            endC = end;
+        }
+        return message.substring(0, Math.min(end, endC));
+    }
+
 }
