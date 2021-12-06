@@ -77,7 +77,9 @@ public class PvAcccessRequestExecutor {
         }
 
         public PVStructure getResult() {
-            return result;
+            synchronized (result) {
+                return result;
+            }
         }
 
         @Override
@@ -97,7 +99,9 @@ public class PvAcccessRequestExecutor {
         public void getDone(Status status, ChannelGet channelGet, PVStructure pvStructure, BitSet changedBitSet) {
             if (status.isSuccess()) {
                 // NOTE: no need to call channelGet.lock()/unlock() since we read pvStructure in the same thread (i.e. in the callback)
-                result = pvStructure;
+                synchronized(result) {
+                    result = pvStructure;
+                }
             }
             doneSignaler.countDown();
         }
