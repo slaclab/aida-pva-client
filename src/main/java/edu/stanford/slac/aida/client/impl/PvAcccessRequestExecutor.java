@@ -5,27 +5,21 @@ import org.epics.pvaccess.client.rpc.RPCClientImpl;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.pv.PVStructure;
 
-import static org.epics.pvdata.pv.Status.StatusType.FATAL;
-import static org.epics.pvdata.pv.Status.StatusType.WARNING;
+import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
 public class PvAcccessRequestExecutor {
+    private static boolean started = false;
     public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
-        ClientFactory.start();
-        RPCClientImpl client;
         try {
-            client = new RPCClientImpl(channelName);
+            ClientFactory.start();
+            RPCClientImpl client = new RPCClientImpl(channelName);
+            PVStructure result = client.request(request, 3.0);
+            client.destroy();
+            return result;
         } catch (Exception e) {
-            throw new RPCRequestException(FATAL, e.getMessage(), e);
+            throw new RPCRequestException(ERROR, e.getMessage(), e);
         }
 
-        PVStructure result = client.request(request, 3.0);
-        try {
-            client.destroy();
-            ClientFactory.stop();
-        } catch (Exception e) {
-            throw new RPCRequestException(WARNING, e.getMessage(), e);
-        }
-        return result;
     }
 
 }
