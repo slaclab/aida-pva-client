@@ -13,13 +13,7 @@ public class PvAcccessRequestExecutor {
     public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         RPCClientImpl client = null;
         try {
-            ChannelProvider cp = ChannelProviderRegistryFactory.getChannelProviderRegistry().getProvider("pva");
-            if ( cp == null ) {
-                System.out.println("Can't find PVA channel provider");
-                ClientFactory.stop();
-                ClientFactory.start();
-                System.out.println("Reset!!");
-            }
+            ClientFactory.start();
             client = new RPCClientImpl(channelName);
             PVStructure result = client.request(request, 3.0);
             return result;
