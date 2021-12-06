@@ -12,7 +12,7 @@ import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 public class PvAcccessRequestExecutor {
     public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         try {
-            ChannelProvider cp = ChannelProviderRegistryFactory.getChannelProviderRegistry().getProvider("pva");
+            ChannelProvider cp = ChannelProviderRegistryFactory.getChannelProviderRegistry().createProvider("pva");
             if ( cp == null ) {
                 throw new RPCRequestException(ERROR, "No pva provider registered");
             }
