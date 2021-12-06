@@ -12,7 +12,6 @@ public class PvAcccessRequestExecutor {
         try {
             RPCClientImpl client = new RPCClientImpl(channelName);
             PVStructure result = client.request(request, 3.0);
-            client.destroy();
             return result;
         } catch (Exception e) {
             throw new RPCRequestException(ERROR, e.getMessage(), e);
