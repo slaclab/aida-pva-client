@@ -29,6 +29,7 @@ public class AidaClientTest {
         }
     }
 
+    @Test
     void test02() {
         try {
             System.out.println("Test for request().returning(INTEGER).get() - Integer");
