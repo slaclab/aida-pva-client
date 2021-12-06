@@ -9,13 +9,12 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>9</maven.compiler.source>
-        <maven.compiler.target>9</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <epics-core.version>7.0.7</epics-core.version>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.epics/epics-core -->
          <dependency>
              <groupId>org.epics</groupId>
              <artifactId>epics-core</artifactId>
@@ -23,7 +22,6 @@
              <type>pom</type>
          </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -96,6 +94,7 @@
         </plugins>
     </build>
 
+<!--
     <repositories>
         <repository>
             <id>EPICS</id>
@@ -103,4 +102,5 @@
             <url>http://epics.sourceforge.net/maven2/</url>
         </repository>
     </repositories>
+-->
 </project>
