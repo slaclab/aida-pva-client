@@ -40,12 +40,12 @@
             <version>5.8.1</version>
             <scope>test</scope>
         </dependency>
+<!--
         <dependency>
             <groupId>org.epics</groupId>
             <artifactId>epics-pvaclient</artifactId>
             <version>4.3.2</version>
         </dependency>
-<!--
         <dependency>
             <groupId>epics</groupId>
             <artifactId>easyPVAJava</artifactId>

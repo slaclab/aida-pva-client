@@ -22,8 +22,7 @@ public class PvAcccessRequestExecutor {
                 System.out.println("Reset!!");
             }
             client = new RPCClientImpl(channelName);
-            PVStructure result = client.request(request, 3.0);
-            return result;
+            return client.request(request, 3.0);
         } catch (Exception e) {
             throw new RPCRequestException(ERROR, e.getMessage(), e);
         } finally {
