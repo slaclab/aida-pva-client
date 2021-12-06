@@ -1,10 +1,8 @@
 package edu.stanford.slac.aida.client.impl;
 
 import org.epics.pvaClient.PvaClient;
-import org.epics.pvaClient.PvaClientRPC;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.pv.PVStructure;
-import org.epics.pvdata.pv.Status;
 
 import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
