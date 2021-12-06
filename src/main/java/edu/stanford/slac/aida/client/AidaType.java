@@ -33,7 +33,7 @@ public enum AidaType {
     FLOAT_ARRAY,    ///< Getter returns a List<Float>
     DOUBLE_ARRAY,   ///< Getter returns a List<Double>
     STRING_ARRAY,   ///< Getter returns a List<String>
-    TABLE;          ///< Getter or setter returns an AidaTable
+    TABLE;          ///< Getter or setter returns a PvaTable
 
     /**
      * Normative Type ID string for URIs

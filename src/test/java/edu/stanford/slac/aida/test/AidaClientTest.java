@@ -1,6 +1,6 @@
 package edu.stanford.slac.aida.test;
 
-import edu.stanford.slac.aida.client.AidaTable;
+import edu.stanford.slac.aida.client.PvaTable;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.junit.jupiter.api.Test;
 
@@ -19,9 +19,9 @@ public class AidaClientTest {
     void testSimpleGet() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for request().returning(INTEGER).get() - Integer");
+            System.out.println("Test for pvaChannel().returning(INTEGER).get() - Integer");
 
-            Integer response = (Integer) request("XCOR:LI31:41:BCON")
+            Integer response = (Integer) pvaChannel("XCOR:LI31:41:BCON")
                     .returning(INTEGER)
                     .get();
             assertEquals(16800, response);
@@ -37,12 +37,12 @@ public class AidaClientTest {
     void testGetRequest() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for getRequest() - Integer");
+            System.out.println("Test for pvaGet() - Integer");
 
-            Integer response = (Integer) getRequest("XCOR:LI31:41:BCON", INTEGER);
+            Integer response = (Integer) pvaGet("XCOR:LI31:41:BCON", INTEGER);
             assertEquals(16800, response);
 
-            System.out.println("getRequest: XCOR:LI31:41:BCON: returned: " + response);
+            System.out.println("pvaGet: XCOR:LI31:41:BCON: returned: " + response);
             System.out.println("_____________________________________________\n");
         } catch (RPCRequestException e) {
             fail(e.getMessage());
@@ -53,9 +53,9 @@ public class AidaClientTest {
     void testSimpleSet() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for request().set() - void");
+            System.out.println("Test for pvaChannel().set() - void");
 
-            request("XCOR:LI31:41:BCON").set(5.0);
+            pvaChannel("XCOR:LI31:41:BCON").set(5.0);
 
             System.out.println("set: XCOR:LI31:41:BCON = 5.0: returned: successfully");
             System.out.println("_____________________________________________\n");
@@ -68,11 +68,11 @@ public class AidaClientTest {
     void testSetRequest() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for setRequest() - void");
+            System.out.println("Test for pvaSet() - void");
 
-            setRequest("XCOR:LI31:41:BCON", 5.0);
+            pvaSet("XCOR:LI31:41:BCON", 5.0);
 
-            System.out.println("setRequest: XCOR:LI31:41:BCON = 5.0: returned: successfully");
+            System.out.println("pvaSet: XCOR:LI31:41:BCON = 5.0: returned: successfully");
             System.out.println("_____________________________________________\n");
         } catch (RPCRequestException e) {
             fail(e.getMessage());
@@ -83,9 +83,9 @@ public class AidaClientTest {
     void testGetTable() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for request().get() - AidaTable");
+            System.out.println("Test for pvaChannel().get() - PvaTable");
 
-            AidaTable table = (AidaTable) request("KLYS:LI31:31:TACT")
+            PvaTable table = (PvaTable) pvaChannel("KLYS:LI31:31:TACT")
                     .with("BEAM", 8)
                     .with("DGRP", "DEV_DGRP")
                     .returning(TABLE)
@@ -109,9 +109,9 @@ public class AidaClientTest {
     void testSetReturningTable() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for request().setReturningTable() - AidaTable");
+            System.out.println("Test for pvaChannel().setReturningTable() - PvaTable");
 
-            AidaTable table = request("KLYS:LI31:31:PDES")
+            PvaTable table = pvaChannel("KLYS:LI31:31:PDES")
                     .with("TRIM", "NO")
                     .setReturningTable(90.0f);
             assertEquals(0.0f, table.getValues().get("PHAS").get(0));
@@ -129,7 +129,7 @@ public class AidaClientTest {
             System.out.println("#############################################");
             System.out.println("Test for get Errors");
 
-            request("XCOR:LI31:4100:BCON")
+            pvaChannel("XCOR:LI31:4100:BCON")
                     .returning(FLOAT)
                     .get();
 
@@ -148,13 +148,13 @@ public class AidaClientTest {
             System.out.println("#############################################");
             System.out.println("Test for set Errors");
 
-            setRequest("XCOR:LI31:41:BCON", "FOO");
+            pvaSet("XCOR:LI31:41:BCON", "FOO");
 
-            fail("setRequest: XCOR:LI31:41:BCON = FOO: should have failed");
+            fail("pvaSet: XCOR:LI31:41:BCON = FOO: should have failed");
         } catch (RPCRequestException e) {
             assertEquals("AidaInternalException; can't convert argument \"FOO\" to float", abbreviate(e.getMessage()));
 
-            System.out.println("setRequest: XCOR:LI31:41:BCON = FOO: failed as expected:" + abbreviate(e.getMessage()));
+            System.out.println("pvaSet: XCOR:LI31:41:BCON = FOO: failed as expected:" + abbreviate(e.getMessage()));
             System.out.println("_____________________________________________\n");
         }
     }

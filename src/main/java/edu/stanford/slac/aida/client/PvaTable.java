@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class AidaTable {
+public class PvaTable {
     List<String> labels = new ArrayList<>();
     List<String> descriptions = new ArrayList<>();
     List<String> units = new ArrayList<>();

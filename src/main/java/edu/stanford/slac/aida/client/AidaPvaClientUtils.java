@@ -7,12 +7,9 @@
  *    - Test Cases
  *
  * @see
- *  testSuiteHeader(),
- *  testCaseHeader(),
- *  testHeader(),
- *  request(),
- *  getRequest(),
- *  setRequest()
+ *  pvaChannel(),
+ *  pvaGet(),
+ *  pvaSet()
  * @noop @formatter:on
  */
 package edu.stanford.slac.aida.client;
@@ -40,11 +37,11 @@ import java.util.stream.Collectors;
  * In order to write a query it is very easy.
  * @subsection p1 e.g. 1: Simple get
  * @code
- *  Float bact = getRequest("XCOR:LI03:120:LEFF", FLOAT);
+ *  Float bact = pvaGet("XCOR:LI03:120:LEFF", FLOAT);
  * @endcode
  * @subsection p2 e.g. 2: Multiple arguments
  * @code
- *  request("NDRFACET:BUFFACQ")
+ *  pvaChannel("NDRFACET:BUFFACQ")
  *      .with("BPMD", 57)
  *      .with("NRPOS", 180)
  *      .with("BPMS", List.of(
@@ -56,11 +53,11 @@ import java.util.stream.Collectors;
  * @endcode
  * @subsection p3 e.g. 3: Simple set
  * @code
- *  setRequest("XCOR:LI31:41:BCON", 5.0f);
+ *  pvaSet("XCOR:LI31:41:BCON", 5.0f);
  * @endcode
  * @subsection p4 e.g. 4: Advanced set
  * @code
- *  Short status = ((AidaTable)request("KLYS:LI31:31:TACT")
+ *  Short status = ((PvaTable)pvaChannel("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
  *      .setReturningTable(0)
@@ -68,7 +65,7 @@ import java.util.stream.Collectors;
  * @endcode
  * @subsection p5 e.g. 5: Selecting the return value type
  * @code
- *  String value = request("KLYS:LI31:31:TACT")
+ *  String value = pvaChannel("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
  *      .returning(STRING)
@@ -114,7 +111,7 @@ public class AidaPvaClientUtils {
      * @param query the starting query for this request
      * @return An AidaPvaRequest that can be further configured before calling get() or set()
      */
-    public static AidaPvaRequest request(final String query) {
+    public static AidaPvaRequest pvaChannel(final String query) {
         return new AidaPvaRequest(pvaRequestExecutor, query);
     }
 
@@ -124,7 +121,7 @@ public class AidaPvaClientUtils {
      * @param channel the channel
      * @param type    the type expected
      */
-    public static Object getRequest(final String channel, AidaType type) throws RPCRequestException {
+    public static Object pvaGet(final String channel, AidaType type) throws RPCRequestException {
         String stringType = type.toString();
         if (type.equals(AidaType.TABLE)) {
             return getTableRequest(channel);
@@ -141,7 +138,7 @@ public class AidaPvaClientUtils {
      * @param channel the channel
      * @param value   the value to set
      */
-    public static void setRequest(final String channel, Object value) throws RPCRequestException {
+    public static void pvaSet(final String channel, Object value) throws RPCRequestException {
         new AidaPvaRequest(pvaRequestExecutor, channel).setter(value);
     }
 
@@ -245,7 +242,7 @@ public class AidaPvaClientUtils {
      *
      * @param query the request
      */
-    private static AidaTable getTableRequest(final String query) throws RPCRequestException {
+    private static PvaTable getTableRequest(final String query) throws RPCRequestException {
         return getTableResults(() -> new AidaPvaRequest(pvaRequestExecutor, query).returning(AidaType.TABLE).getter());
     }
 
@@ -263,23 +260,23 @@ public class AidaPvaClientUtils {
 
     /**
      * Internal: Get table results.
-     * It uses the supplied result-supplier to get the result and marshal it into a AidaTable object.
+     * It uses the supplied result-supplier to get the result and marshal it into a PvaTable object.
      *
      * @param supplier the supplier of the results
      */
-    private static AidaTable getTableResults(AidaGetter<PVStructure> supplier) throws RPCRequestException {
+    private static PvaTable getTableResults(AidaGetter<PVStructure> supplier) throws RPCRequestException {
         return tableResults(supplier.get());
     }
 
     /**
-     * Internal: To get an AidaTable from a PVStructure result object
+     * Internal: To get an PvaTable from a PVStructure result object
      *
      * @param result the results to be displayed
-     * @return AidaTable
+     * @return PvaTable
      */
-    static AidaTable tableResults(PVStructure result) {
+    static PvaTable tableResults(PVStructure result) {
         // Aida table for return
-        AidaTable table = new AidaTable();
+        PvaTable table = new PvaTable();
 
         // Get labels
         List<String> labels = new ArrayList<>();

@@ -87,18 +87,18 @@ public class AidaPvaRequest {
 
     /**
      * Set VALUE argument of the request and execute and return the result as an
-     * AidaTable.  Exceptions are thrown to caller
+     * PvaTable.  Exceptions are thrown to caller
      *
      * @param value to set
-     * @return the AidaTable
+     * @return the PvaTable
      */
-    public AidaTable setReturningTable(Object value) throws RPCRequestException {
-        return (AidaTable) AidaPvaClientUtils.executeRequest(() -> setter(value));
+    public PvaTable setReturningTable(Object value) throws RPCRequestException {
+        return (PvaTable) AidaPvaClientUtils.executeRequest(() -> setter(value));
     }
 
     /**
      * Execute the request and return the result as an Object which can be a scalar, scalar list
-     * or AidaTable.  Exceptions are thrown to caller.
+     * or PvaTable.  Exceptions are thrown to caller.
      *
      * @return the result of the request
      */
