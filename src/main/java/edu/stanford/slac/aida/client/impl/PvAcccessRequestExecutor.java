@@ -9,12 +9,13 @@ import org.epics.pvdata.pv.PVStructure;
 
 import java.util.Arrays;
 
+import static org.epics.ca.ClientFactory.PROVIDER_NAME;
 import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
 public class PvAcccessRequestExecutor {
     public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         try {
-            System.out.println(Arrays.toString(ChannelProviderRegistryFactory.getChannelProviderRegistry().getProviderNames()));
+            System.out.println(ChannelProviderRegistryFactory.getChannelProviderRegistry().getProvider(PROVIDER_NAME));
             RPCClientImpl client = new RPCClientImpl(channelName);
             PVStructure result = client.request(request, 3.0);
             return result;
