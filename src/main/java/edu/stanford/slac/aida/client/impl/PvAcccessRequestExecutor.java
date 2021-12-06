@@ -7,15 +7,14 @@ import org.epics.pvaccess.client.rpc.RPCClientImpl;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.pv.PVStructure;
 
+import java.util.Arrays;
+
 import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
 public class PvAcccessRequestExecutor {
     public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         try {
-            ChannelProvider cp = ChannelProviderRegistryFactory.getChannelProviderRegistry().createProvider("pva");
-            if ( cp == null ) {
-                throw new RPCRequestException(ERROR, "No pva provider registered");
-            }
+            System.out.println(Arrays.toString(ChannelProviderRegistryFactory.getChannelProviderRegistry().getProviderNames()));
             RPCClientImpl client = new RPCClientImpl(channelName);
             PVStructure result = client.request(request, 3.0);
             return result;
