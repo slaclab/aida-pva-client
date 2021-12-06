@@ -20,7 +20,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for request().returning(INTEGER).get() - Integer");
-            System.out.println("#############################################");
 
             Integer response = (Integer) request("XCOR:LI31:41:BCON")
                     .returning(INTEGER)
@@ -39,7 +38,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for getRequest() - Integer");
-            System.out.println("#############################################");
 
             Integer response = (Integer) getRequest("XCOR:LI31:41:BCON", INTEGER);
             assertEquals(16800, response);
@@ -56,7 +54,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for request().set() - void");
-            System.out.println("#############################################");
 
             request("XCOR:LI31:41:BCON").set(5.0);
 
@@ -72,7 +69,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for setRequest() - void");
-            System.out.println("#############################################");
 
             setRequest("XCOR:LI31:41:BCON", 5.0);
 
@@ -88,7 +84,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for request().get() - AidaTable");
-            System.out.println("#############################################");
 
             AidaTable table = (AidaTable) request("KLYS:LI31:31:TACT")
                     .with("BEAM", 8)
@@ -115,7 +110,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for request().setReturningTable() - AidaTable");
-            System.out.println("#############################################");
 
             AidaTable table = request("KLYS:LI31:31:PDES")
                     .with("TRIM", "NO")
@@ -134,7 +128,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for get Errors");
-            System.out.println("#############################################");
 
             request("XCOR:LI31:4100:BCON")
                     .returning(FLOAT)
@@ -154,7 +147,6 @@ public class AidaClientTest {
         try {
             System.out.println("#############################################");
             System.out.println("Test for set Errors");
-            System.out.println("#############################################");
 
             setRequest("XCOR:LI31:41:BCON", "FOO");
 
