@@ -19,9 +19,9 @@ public class AidaClientTest {
     void testSimpleGet() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for pvaChannel().returning(INTEGER).get() - Integer");
+            System.out.println("Test for pvaRequest().returning(INTEGER).get() - Integer");
 
-            Integer response = (Integer) pvaChannel("XCOR:LI31:41:BCON")
+            Integer response = (Integer) pvaRequest("XCOR:LI31:41:BCON")
                     .returning(INTEGER)
                     .get();
             assertEquals(16800, response);
@@ -53,9 +53,9 @@ public class AidaClientTest {
     void testSimpleSet() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for pvaChannel().set() - void");
+            System.out.println("Test for pvaRequest().set() - void");
 
-            pvaChannel("XCOR:LI31:41:BCON").set(5.0);
+            pvaRequest("XCOR:LI31:41:BCON").set(5.0);
 
             System.out.println("set: XCOR:LI31:41:BCON = 5.0: returned: successfully");
             System.out.println("_____________________________________________\n");
@@ -83,9 +83,9 @@ public class AidaClientTest {
     void testGetTable() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for pvaChannel().get() - PvaTable");
+            System.out.println("Test for pvaRequest().get() - PvaTable");
 
-            PvaTable table = (PvaTable) pvaChannel("KLYS:LI31:31:TACT")
+            PvaTable table = (PvaTable) pvaRequest("KLYS:LI31:31:TACT")
                     .with("BEAM", 8)
                     .with("DGRP", "DEV_DGRP")
                     .returning(TABLE)
@@ -109,9 +109,9 @@ public class AidaClientTest {
     void testSetReturningTable() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for pvaChannel().setReturningTable() - PvaTable");
+            System.out.println("Test for pvaRequest().setReturningTable() - PvaTable");
 
-            PvaTable table = pvaChannel("KLYS:LI31:31:PDES")
+            PvaTable table = pvaRequest("KLYS:LI31:31:PDES")
                     .with("TRIM", "NO")
                     .setReturningTable(90.0f);
             assertEquals(0.0f, table.getValues().get("PHAS").get(0));
@@ -129,7 +129,7 @@ public class AidaClientTest {
             System.out.println("#############################################");
             System.out.println("Test for get Errors");
 
-            pvaChannel("XCOR:LI31:4100:BCON")
+            pvaRequest("XCOR:LI31:4100:BCON")
                     .returning(FLOAT)
                     .get();
 

@@ -7,7 +7,7 @@
  *    - Test Cases
  *
  * @see
- *  pvaChannel(),
+ *  pvaRequest(),
  *  pvaGet(),
  *  pvaSet()
  * @noop @formatter:on
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @endcode
  * @subsection p2 e.g. 2: Multiple arguments
  * @code
- *  pvaChannel("NDRFACET:BUFFACQ")
+ *  pvaRequest("NDRFACET:BUFFACQ")
  *      .with("BPMD", 57)
  *      .with("NRPOS", 180)
  *      .with("BPMS", List.of(
@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
  * @endcode
  * @subsection p4 e.g. 4: Advanced set
  * @code
- *  Short status = ((PvaTable)pvaChannel("KLYS:LI31:31:TACT")
+ *  Short status = ((PvaTable)pvaRequest("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
  *      .setReturningTable(0)
@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  * @endcode
  * @subsection p5 e.g. 5: Selecting the return value type
  * @code
- *  String value = pvaChannel("KLYS:LI31:31:TACT")
+ *  String value = pvaRequest("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
  *      .returning(STRING)
@@ -111,7 +111,7 @@ public class AidaPvaClientUtils {
      * @param query the starting query for this request
      * @return An AidaPvaRequest that can be further configured before calling get() or set()
      */
-    public static AidaPvaRequest pvaChannel(final String query) {
+    public static AidaPvaRequest pvaRequest(final String query) {
         return new AidaPvaRequest(pvaRequestExecutor, query);
     }
 
