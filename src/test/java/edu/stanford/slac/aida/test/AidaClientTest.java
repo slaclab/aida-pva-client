@@ -109,11 +109,11 @@ public class AidaClientTest {
     void testSetReturningTable() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for pvaRequest().setReturningTable() - PvaTable");
+            System.out.println("Test for pvaRequest().set() - PvaTable");
 
             PvaTable table = pvaRequest("KLYS:LI31:31:PDES")
                     .with("TRIM", "NO")
-                    .setReturningTable(90.0f);
+                    .set(90.0f);
             assertEquals(0.0f, table.getValues().get("PHAS").get(0));
 
             System.out.println("set: KLYS:LI31:31:PDES = 0: returned: " + table);

@@ -41,8 +41,8 @@ In order to write a query it is very easy.
  Short status = ((AidaTable)request("KLYS:LI31:31:TACT")
      .with("BEAM", 8)
      .with("DGRP", "DEV_DGRP")
-     .setReturningTable(0)
-     ).getValues().setReturningTable("status").get(0);
+     .set(0)
+     ).getValues().set("status").get(0);
 ```
 
 ### e.g. 6: Selecting the return value type

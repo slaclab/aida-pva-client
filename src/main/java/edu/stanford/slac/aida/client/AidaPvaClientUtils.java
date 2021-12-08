@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
  *  Short status = ((PvaTable)pvaRequest("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
- *      .setReturningTable(0)
+ *      .set(0)
  *      ).getValues().get("status").get(0);
  * @endcode
  * @subsection p5 e.g. 5: Selecting the return value type

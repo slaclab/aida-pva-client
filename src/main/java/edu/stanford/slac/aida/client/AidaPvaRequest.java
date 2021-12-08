@@ -79,22 +79,13 @@ public class AidaPvaRequest {
     }
 
     /**
-     * Set VALUE argument of the request and execute.  Exceptions are thrown to caller
-     *
-     * @param value to set
-     */
-    public void set(Object value) throws RPCRequestException {
-        AidaPvaClientUtils.executeRequest(() -> setter(value));
-    }
-
-    /**
      * Set VALUE argument of the request and execute and return the result as an
-     * PvaTable.  Exceptions are thrown to caller
+     * PvaTable.  Return null if the channel return void
      *
      * @param value to set
      * @return the PvaTable
      */
-    public PvaTable setReturningTable(Object value) throws RPCRequestException {
+    public PvaTable set(Object value) throws RPCRequestException {
         return (PvaTable) AidaPvaClientUtils.executeRequest(() -> setter(value));
     }
 
