@@ -87,7 +87,7 @@ public class AidaPvaRequest {
      */
     public PvaTable set(Object value) throws RPCRequestException {
         Object response = AidaPvaClientUtils.executeRequest(() -> setter(value));
-        if (response == null) {
+        if (response == null || response instanceof String) {
             return null;
         } else {
             return ((PvaTable) response);
