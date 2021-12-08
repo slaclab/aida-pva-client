@@ -9,8 +9,13 @@ import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 public class PvaClientRequestExecutor {
     public static PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         try {
-            return PvaClient.get("pva").channel(channelName).rpc(request);
+            PVStructure response = PvaClient.get("pva").channel(channelName).rpc(request);
+            if ( response == null ) {
+                throw new RPCRequestException(ERROR, "error executing PvaRequest");
+            }
+            return response;
         } catch (Exception e) {
+            // Will never get here rpc() never throws
             throw new RPCRequestException(ERROR, e.getMessage());
         }
     }
