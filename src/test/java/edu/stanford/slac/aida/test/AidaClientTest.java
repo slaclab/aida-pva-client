@@ -4,6 +4,9 @@ import edu.stanford.slac.aida.client.PvaTable;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static edu.stanford.slac.aida.client.AidaPvaClientUtils.*;
 import static edu.stanford.slac.aida.client.AidaType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,14 +43,18 @@ public class AidaClientTest {
             System.out.println("Test for pvaGet() - no type");
 
             PvaTable table = (PvaTable) pvaGet("DEV_DGRP:XCOR:BDES");
-            assertEquals("XCOR:LI31:41", table.getValues().get("name").get(0));
-            assertEquals(0.0, table.getValues().get("value").get(0));
-            assertEquals("XCOR:LI31:201", table.getValues().get("name").get(1));
-            assertEquals(0.0, table.getValues().get("value").get(1));
-            assertEquals("XCOR:LI31:301", table.getValues().get("name").get(2));
-            assertEquals(0.0, table.getValues().get("value").get(2));
-            assertEquals("XCOR:LI31:401", table.getValues().get("name").get(3));
-            assertEquals(0.03, table.getValues().get("value").get(3));
+            Map<String, List<Object>> tableValues = table.getValues();
+            List<Object> names = tableValues.get("value");
+            List<Object> values = tableValues.get("value");
+
+            assertEquals("XCOR:LI31:41", names.get(0));
+            assertEquals(0.0, values.get(0));
+            assertEquals("XCOR:LI31:201", names.get(1));
+            assertEquals(0.0, values.get(1));
+            assertEquals("XCOR:LI31:301", names.get(2));
+            assertEquals(0.0, values.get(2));
+            assertEquals("XCOR:LI31:401", names.get(3));
+            assertEquals(0.03, values.get(3));
 
             System.out.println("pvaGet: DEV_DGRP:XCOR:BDES: returned: " + table);
             System.out.println("_____________________________________________\n");
