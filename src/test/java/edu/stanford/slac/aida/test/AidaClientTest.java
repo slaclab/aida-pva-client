@@ -48,13 +48,13 @@ public class AidaClientTest {
             List<Object> secondaryValues = tableValues.get("secondary");
 
             assertEquals("XCOR:LI31:41", names.get(0));
-            assertEquals(0.0, secondaryValues.get(0));
+            assertEquals(0.0f, secondaryValues.get(0));
             assertEquals("XCOR:LI31:201", names.get(1));
-            assertEquals(0.0, secondaryValues.get(1));
+            assertEquals(0.0f, secondaryValues.get(1));
             assertEquals("XCOR:LI31:301", names.get(2));
-            assertEquals(0.0, secondaryValues.get(2));
+            assertEquals(0.0f, secondaryValues.get(2));
             assertEquals("XCOR:LI31:401", names.get(3));
-            assertEquals(0.03, secondaryValues.get(3));
+            assertEquals(0.03f, secondaryValues.get(3));
 
             System.out.println("pvaGet: DEV_DGRP:XCOR:BDES: returned: " + table);
             System.out.println("_____________________________________________\n");
