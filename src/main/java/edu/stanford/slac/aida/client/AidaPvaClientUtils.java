@@ -119,6 +119,15 @@ public class AidaPvaClientUtils {
      * Call a channel getter with no arguments
      *
      * @param channel the channel
+     */
+    public static Object pvaGet(final String channel) throws RPCRequestException {
+        return new AidaPvaRequest(pvaRequestExecutor, channel).get();
+    }
+
+    /**
+     * Call a channel getter with no arguments
+     *
+     * @param channel the channel
      * @param type    the type expected
      */
     public static Object pvaGet(final String channel, AidaType type) throws RPCRequestException {

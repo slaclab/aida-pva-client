@@ -34,6 +34,29 @@ public class AidaClientTest {
     }
 
     @Test
+    void testGetRequestWithNoType() {
+        try {
+            System.out.println("#############################################");
+            System.out.println("Test for pvaGet() - no type");
+
+            PvaTable table = (PvaTable) pvaGet("DEV_DGRP:XCOR:BDES");
+            assertEquals("XCOR:LI31:41", table.getValues().get("name").get(0));
+            assertEquals(0.0, table.getValues().get("value").get(0));
+            assertEquals("XCOR:LI31:201", table.getValues().get("name").get(1));
+            assertEquals(0.0, table.getValues().get("value").get(1));
+            assertEquals("XCOR:LI31:301", table.getValues().get("name").get(2));
+            assertEquals(0.0, table.getValues().get("value").get(2));
+            assertEquals("XCOR:LI31:401", table.getValues().get("name").get(3));
+            assertEquals(0.03, table.getValues().get("value").get(3));
+
+            System.out.println("pvaGet: DEV_DGRP:XCOR:BDES: returned: " + table);
+            System.out.println("_____________________________________________\n");
+        } catch (RPCRequestException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     void testGetRequest() {
         try {
             System.out.println("#############################################");
