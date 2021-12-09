@@ -44,17 +44,17 @@ public class AidaClientTest {
 
             PvaTable table = (PvaTable) pvaGet("DEV_DGRP:XCOR:BDES");
             Map<String, List<Object>> tableValues = table.getValues();
-            List<Object> names = tableValues.get("value");
-            List<Object> values = tableValues.get("value");
+            List<Object> names = tableValues.get("name");
+            List<Object> secondaryValues = tableValues.get("secondary");
 
             assertEquals("XCOR:LI31:41", names.get(0));
-            assertEquals(0.0, values.get(0));
+            assertEquals(0.0, secondaryValues.get(0));
             assertEquals("XCOR:LI31:201", names.get(1));
-            assertEquals(0.0, values.get(1));
+            assertEquals(0.0, secondaryValues.get(1));
             assertEquals("XCOR:LI31:301", names.get(2));
-            assertEquals(0.0, values.get(2));
+            assertEquals(0.0, secondaryValues.get(2));
             assertEquals("XCOR:LI31:401", names.get(3));
-            assertEquals(0.03, values.get(3));
+            assertEquals(0.03, secondaryValues.get(3));
 
             System.out.println("pvaGet: DEV_DGRP:XCOR:BDES: returned: " + table);
             System.out.println("_____________________________________________\n");
