@@ -159,7 +159,7 @@ public class AidaPvaRequest {
         try {
             return requestExecutor.executeRequest(channelName, request);
         } catch (RPCRequestException e) {
-            throw new RPCRequestException(ERROR, abbreviate(e.getMessage()));
+            throw new RPCRequestException(ERROR, channelName + "(" + argumentBuilder + ") :" + abbreviate(e.getMessage()));
         }
     }
 

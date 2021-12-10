@@ -7,11 +7,7 @@ package edu.stanford.slac.aida.client;
 import org.epics.pvdata.factory.FieldFactory;
 import org.epics.pvdata.pv.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
 
@@ -130,6 +126,24 @@ class ArgumentBuilder {
             return (fieldCreate.createScalar(ScalarType.pvDouble));
         } else if (value instanceof String) {
             return (fieldCreate.createScalar(ScalarType.pvString));
+        } else if (value instanceof Boolean[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
+        } else if (value instanceof Byte[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvByte));
+        } else if (value instanceof Short[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvShort));
+        } else if (value instanceof Integer[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvInt));
+        } else if (value instanceof Long[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvLong));
+        } else if (value instanceof Float[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvFloat));
+        } else if (value instanceof Double[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvDouble));
+        } else if (value instanceof String[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvString));
+        } else if (value instanceof Object[]) {
+            return (fieldCreate.createScalarArray(ScalarType.pvString));
         } else if (value instanceof List) {
             // determine type of list by getting first element.
             List<?> valueList = (List<?>) value;
@@ -207,40 +221,78 @@ class ArgumentBuilder {
             } else if (pvField instanceof PVString) {
                 ((PVString) (pvField)).put((String) value);
             } else if (pvField instanceof PVBooleanArray) {
-                List<Boolean> valueList = (List<Boolean>) value;
-                Boolean[] list = valueList.toArray(new Boolean[0]);
+                Boolean[] list;
+                if (value instanceof Boolean[]) {
+                    list = (Boolean[]) value;
+                } else {
+                    List<Boolean> valueList = (List<Boolean>) value;
+                    list = valueList.toArray(new Boolean[0]);
+                }
                 ((PVBooleanArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVByteArray) {
-                List<Byte> valueList = (List<Byte>) value;
-                Byte[] list = valueList.toArray(new Byte[0]);
+                Byte[] list;
+                if (value instanceof Byte[]) {
+                    list = (Byte[]) value;
+                } else {
+                    List<Byte> valueList = (List<Byte>) value;
+                    list = valueList.toArray(new Byte[0]);
+                }
                 ((PVByteArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVShortArray) {
-                List<Short> valueList = (List<Short>) value;
-                Short[] list = valueList.toArray(new Short[0]);
+                Short[] list;
+                if (value instanceof Short[]) {
+                    list = (Short[]) value;
+                } else {
+                    List<Short> valueList = (List<Short>) value;
+                    list = valueList.toArray(new Short[0]);
+                }
                 ((PVShortArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVIntArray) {
-                List<Integer> valueList = (List<Integer>) value;
-                Integer[] list = valueList.toArray(new Integer[0]);
+                Integer[] list;
+                if (value instanceof Integer[]) {
+                    list = (Integer[]) value;
+                } else {
+                    List<Integer> valueList = (List<Integer>) value;
+                    list = valueList.toArray(new Integer[0]);
+                }
                 ((PVIntArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVLongArray) {
-                List<Long> valueList = (List<Long>) value;
-                Long[] list = valueList.toArray(new Long[0]);
+                Long[] list;
+                if (value instanceof Long[]) {
+                    list = (Long[]) value;
+                } else {
+                    List<Long> valueList = (List<Long>) value;
+                    list = valueList.toArray(new Long[0]);
+                }
                 ((PVLongArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVFloatArray) {
-                // Some values may be given as doubles even though we want floats (e.g. PI) so we need to coerce all to Floats first
-                List<Float> valueList = (List<Float>) ((List<Object>) value)
-                        .stream()
-                        .map(o -> o instanceof Float ? (Float) o : o instanceof Double ? ((Double) o).floatValue() : Float.parseFloat(o.toString()))
-                        .collect(Collectors.toList());
-                Float[] list = valueList.toArray(new Float[0]);
+                Float[] list;
+                if (value instanceof Float[]) {
+                    list = (Float[]) value;
+                } else {
+                    // Some values may be given as doubles even though we want floats (e.g. PI) so we need to coerce all to Floats first
+                    list = ((List<Object>) value)
+                            .stream()
+                            .map(o -> o instanceof Float ? (Float) o : o instanceof Double ? ((Double) o).floatValue() : Float.parseFloat(o.toString())).toArray(Float[]::new);
+                }
                 ((PVFloatArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVDoubleArray) {
-                List<Double> valueList = (List<Double>) value;
-                Double[] list = valueList.toArray(new Double[0]);
+                Double[] list;
+                if (value instanceof Double[]) {
+                    list = (Double[]) value;
+                } else {
+                    List<Double> valueList = (List<Double>) value;
+                    list = valueList.toArray(new Double[0]);
+                }
                 ((PVDoubleArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVStringArray) {
-                List<String> valueList = (List<String>) value;
-                String[] list = valueList.toArray(new String[0]);
+                String[] list;
+                if (value instanceof String[]) {
+                    list = (String[]) value;
+                } else {
+                    List<String> valueList = (List<String>) value;
+                    list = valueList.toArray(new String[0]);
+                }
                 ((PVStringArray) (pvField)).put(0, list.length, list, 0);
             } else if (pvField instanceof PVStructure) {
                 Map<String, Object> subValueMap = (Map<String, Object>) value;
@@ -257,7 +309,7 @@ class ArgumentBuilder {
         boolean firstTime = true;
         for (Map.Entry<String, Object> entrySet : fieldMap.entrySet()) {
             String name = entrySet.getKey();
-            Object value = entrySet.getValue();
+            Object value = coerceArrays(entrySet.getValue());
             if (!firstTime) {
                 stringBuilder.append(", ");
             }
@@ -265,5 +317,35 @@ class ArgumentBuilder {
             stringBuilder.append(name).append("=").append(value);
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * To Coerce arrays into lists
+     *
+     * @param value the value
+     * @return the coerced value if it was an array otherwise value
+     */
+    private Object coerceArrays(Object value) {
+        if (value instanceof Boolean[]) {
+            return Arrays.asList((Boolean[]) value);
+        } else if (value instanceof Byte[]) {
+            return Arrays.asList((Byte[]) value);
+        } else if (value instanceof Short[]) {
+            return Arrays.asList((Short[]) value);
+        } else if (value instanceof Integer[]) {
+            return Arrays.asList((Integer[]) value);
+        } else if (value instanceof Long[]) {
+            return Arrays.asList((Long[]) value);
+        } else if (value instanceof Float[]) {
+            return Arrays.asList((Float[]) value);
+        } else if (value instanceof Double[]) {
+            return Arrays.asList((Double[]) value);
+        } else if (value instanceof String[]) {
+            return Arrays.asList((String[]) value);
+        } else if (value instanceof Object[]) {
+            return Arrays.asList((Object[]) value);
+        } else {
+            return value;
+        }
     }
 }
