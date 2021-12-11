@@ -56,7 +56,7 @@ class ArgumentBuilder {
     /**
      * Map of name setTo pairs for arguments and values
      */
-    private final Map<String, Object> fieldMap = new HashMap<>();
+    private final Map<String, Object> fieldMap = new HashMap<String, Object>();
 
     /**
      * Add an argument
@@ -86,8 +86,8 @@ class ArgumentBuilder {
      * @return the corresponding structure
      */
     private Structure getStructure(Map<String, Object> valueMap) {
-        List<String> names = new ArrayList<>();
-        List<Field> fields = new ArrayList<>();
+        List<String> names = new ArrayList<String>();
+        List<Field> fields = new ArrayList<Field>();
 
         // Create the list of names and fields to create the structure with
         for (Map.Entry<String, Object> entrySet : valueMap.entrySet()) {
@@ -97,10 +97,7 @@ class ArgumentBuilder {
 
         // Create the query structure that will host the fields
         // note that you need to call initialise to fill in the actual values
-        return FieldFactory.getFieldCreate().createStructure(
-                names.toArray(new String[0]),
-                fields.toArray(new Field[0])
-        );
+        return FieldFactory.getFieldCreate().createStructure(names.toArray(new String[0]), fields.toArray(new Field[0]));
     }
 
     /**
@@ -109,6 +106,7 @@ class ArgumentBuilder {
      * @param value the given value
      * @return the field to hold this value
      */
+    @SuppressWarnings("unchecked")
     private Field getField(Object value) {
         if (value instanceof Boolean) {
             return (fieldCreate.createScalar(ScalarType.pvBoolean));
@@ -121,9 +119,21 @@ class ArgumentBuilder {
         } else if (value instanceof Long) {
             return (fieldCreate.createScalar(ScalarType.pvLong));
         } else if (value instanceof Float) {
-            return (fieldCreate.createScalar(ScalarType.pvFloat));
+            if (isInteger(((Float) value).doubleValue())) {
+                return (fieldCreate.createScalar(ScalarType.pvInt));
+            } else if (isLong(((Float) value).doubleValue())) {
+                return (fieldCreate.createScalar(ScalarType.pvLong));
+            } else {
+                return (fieldCreate.createScalar(ScalarType.pvFloat));
+            }
         } else if (value instanceof Double) {
-            return (fieldCreate.createScalar(ScalarType.pvDouble));
+            if (isInteger((Double) value)) {
+                return (fieldCreate.createScalar(ScalarType.pvInt));
+            } else if (isLong((Double) value)) {
+                return (fieldCreate.createScalar(ScalarType.pvLong));
+            } else {
+                return (fieldCreate.createScalar(ScalarType.pvDouble));
+            }
         } else if (value instanceof String) {
             return (fieldCreate.createScalar(ScalarType.pvString));
         } else if (value instanceof Boolean[]) {
@@ -162,7 +172,13 @@ class ArgumentBuilder {
             } else if (firstElement instanceof Long) {
                 return (fieldCreate.createScalarArray(ScalarType.pvLong));
             } else if (firstElement instanceof Float) {
-                return (fieldCreate.createScalarArray(ScalarType.pvFloat));
+                if (areIntegers((List<Object>) valueList)) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvInt));
+                } else if (areLongs((List<Object>) value)) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvLong));
+                } else {
+                    return (fieldCreate.createScalarArray(ScalarType.pvFloat));
+                }
             } else if (firstElement instanceof Double) {
                 return (fieldCreate.createScalarArray(ScalarType.pvDouble));
             } else if (firstElement instanceof String) {
@@ -211,9 +227,21 @@ class ArgumentBuilder {
             } else if (pvField instanceof PVShort) {
                 ((PVShort) (pvField)).put((Short) value);
             } else if (pvField instanceof PVInt) {
-                ((PVInt) (pvField)).put((Integer) value);
+                if (value instanceof Float) {
+                    ((PVInt) (pvField)).put(((Float) value).intValue());
+                } else if (value instanceof Double) {
+                    ((PVInt) (pvField)).put(((Double) value).intValue());
+                } else {
+                    ((PVInt) (pvField)).put((Integer) value);
+                }
             } else if (pvField instanceof PVLong) {
-                ((PVLong) (pvField)).put((Long) value);
+                if (value instanceof Float) {
+                    ((PVLong) (pvField)).put(((Float) value).longValue());
+                } else if (value instanceof Double) {
+                    ((PVLong) (pvField)).put(((Double) value).longValue());
+                } else {
+                    ((PVLong) (pvField)).put((Long) value);
+                }
             } else if (pvField instanceof PVFloat) {
                 ((PVFloat) (pvField)).put((Float) value);
             } else if (pvField instanceof PVDouble) {
@@ -252,7 +280,7 @@ class ArgumentBuilder {
                 if (value instanceof Integer[]) {
                     list = (Integer[]) value;
                 } else {
-                    List<Integer> valueList = (List<Integer>) value;
+                    List<Integer> valueList = toIntegerList((List<Object>) value);
                     list = valueList.toArray(new Integer[0]);
                 }
                 ((PVIntArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
@@ -261,19 +289,23 @@ class ArgumentBuilder {
                 if (value instanceof Long[]) {
                     list = (Long[]) value;
                 } else {
-                    List<Long> valueList = (List<Long>) value;
+                    List<Long> valueList = toLongList((List<Object>) value);
                     list = valueList.toArray(new Long[0]);
                 }
                 ((PVLongArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVFloatArray) {
-                Float[] list;
-                if (value instanceof Float[]) {
-                    list = (Float[]) value;
-                } else {
-                    // Some values may be given as doubles even though we want floats (e.g. PI) so we need to coerce all to Floats first
-                    list = ((List<Object>) value)
-                            .stream()
-                            .map(o -> o instanceof Float ? (Float) o : o instanceof Double ? ((Double) o).floatValue() : Float.parseFloat(o.toString())).toArray(Float[]::new);
+                // Some values may be given as doubles even though we want floats (e.g. PI) so we need to coerce all to Floats first
+                List<Object> values = (List<Object>) value;
+                Float[] list = new Float[values.size()];
+                for (int i = 0; i < values.size(); i++) {
+                    Object val = values.get(i);
+                    if (val instanceof Float) {
+                        list[i] = ((Float) val);
+                    } else if (val instanceof Double) {
+                        list[i] = ((Double) val).floatValue();
+                    } else {
+                        list[i] = Float.parseFloat(val.toString());
+                    }
                 }
                 ((PVFloatArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVDoubleArray) {
@@ -303,24 +335,52 @@ class ArgumentBuilder {
         }
     }
 
-    @Override
-    public String toString() {
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean firstTime = true;
-        for (Map.Entry<String, Object> entrySet : fieldMap.entrySet()) {
-            String name = entrySet.getKey();
-            Object value = coerceArrays(entrySet.getValue());
-            if (!firstTime) {
-                stringBuilder.append(", ");
+    /**
+     * Internal: When we need an integer list but may have been given floats and doubles
+     * use this method to convert everything to integers.  Must only be used if
+     * you've already called areIntegers() on the list.
+     *
+     * @param values the list of values to convert
+     * @return the converted list
+     */
+    private List<Integer> toIntegerList(List<Object> values) {
+        List<Integer> list = new ArrayList<Integer>();
+        for (Object value : values) {
+            if (value instanceof Float) {
+                list.add(((Float) value).intValue());
+            } else if (value instanceof Double) {
+                list.add(((Double) value).intValue());
+            } else {
+                list.add((Integer) value);
             }
-            firstTime = false;
-            stringBuilder.append(name).append("=").append(value);
         }
-        return stringBuilder.toString();
+        return list;
     }
 
     /**
-     * To Coerce arrays into lists
+     * Internal: When we need a long list but may have been given floats and doubles
+     * use this method to convert everything to longs.  Must only be used if
+     * you've already called areLongs() on the list.
+     *
+     * @param values the list of values to convert
+     * @return the converted list
+     */
+    private List<Long> toLongList(List<Object> values) {
+        List<Long> list = new ArrayList<Long>();
+        for (Object value : values) {
+            if (value instanceof Float) {
+                list.add(((Float) value).longValue());
+            } else if (value instanceof Double) {
+                list.add(((Double) value).longValue());
+            } else {
+                list.add((Long) value);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Internal: To Coerce arrays into lists
      *
      * @param value the value
      * @return the coerced value if it was an array otherwise value
@@ -347,5 +407,87 @@ class ArgumentBuilder {
         } else {
             return value;
         }
+    }
+
+    /**
+     * Internal: Return true if the given double is really an integer value
+     *
+     * @param d the given double
+     * @return true if the double is an integer value
+     */
+    private boolean isInteger(Double d) {
+        return d < Integer.MAX_VALUE && d > Integer.MIN_VALUE && (d % 1) == 0;
+    }
+
+    /**
+     * Internal: Return true if the given double is really an long integer value
+     *
+     * @param d the given double
+     * @return true if the double is a long integer value
+     */
+    private boolean isLong(Double d) {
+        return d < Long.MAX_VALUE && d > Long.MIN_VALUE && (d % 1) == 0;
+    }
+
+    /**
+     * Internal: Return true if the given list are all integer values
+     *
+     * @param list the given list
+     * @return true if the list contains only integers
+     */
+    private boolean areIntegers(List<Object> list) {
+        for (Object d : list) {
+            if (d instanceof Float) {
+                if (!isInteger(((Float) d).doubleValue())) {
+                    return false;
+                }
+            } else if (d instanceof Double) {
+                if (!isInteger((Double) d)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Internal: Return true if the given list are all long integer values
+     *
+     * @param list the given list
+     * @return true if the list contains only long integers
+     */
+    private boolean areLongs(List<Object> list) {
+        for (Object d : list) {
+            if (d instanceof Float) {
+                if (!isLong(((Float) d).doubleValue())) {
+                    return false;
+                }
+            } else if (d instanceof Double) {
+                if (!isLong((Double) d)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean firstTime = true;
+        for (Map.Entry<String, Object> entrySet : fieldMap.entrySet()) {
+            String name = entrySet.getKey();
+            Object value = coerceArrays(entrySet.getValue());
+            if (!firstTime) {
+                stringBuilder.append(", ");
+            }
+            firstTime = false;
+            stringBuilder.append(name).append("=").append(value);
+        }
+        return stringBuilder.toString();
     }
 }

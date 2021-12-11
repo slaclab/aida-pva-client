@@ -85,8 +85,13 @@ public class AidaPvaRequest {
      * @param value to set
      * @return the PvaTable
      */
-    public PvaTable set(Object value) throws RPCRequestException {
-        Object response = AidaPvaClientUtils.executeRequest(() -> setter(value));
+    public PvaTable set(final Object value) throws RPCRequestException {
+        Object response = AidaPvaClientUtils.executeRequest(new AidaRequest<PVStructure>() {
+            @Override
+            public PVStructure execute() throws RPCRequestException {
+                return setter(value);
+            }
+        });
         if (response == null || response instanceof String) {
             return null;
         } else {
@@ -101,7 +106,40 @@ public class AidaPvaRequest {
      * @return the result of the request
      */
     public Object get() throws RPCRequestException {
-        return AidaPvaClientUtils.executeRequest(this::getter);
+        return AidaPvaClientUtils.executeRequest(new AidaRequest<PVStructure>() {
+            @Override
+            public PVStructure execute() throws RPCRequestException {
+                return getter();
+            }
+        });
+    }
+
+    /**
+     * Get the uri formed from the builder
+     *
+     * @return the NTURI PVStructure
+     */
+    public PVStructure uri() {
+        // Build the arguments structure
+        Structure arguments = argumentBuilder.build();
+
+        // Build the uri structure
+        Structure uriStructure =
+                fieldCreate.createStructure(AidaType.NTURI_ID,
+                        new String[]{"path", "scheme", "query"},
+                        new Field[]{fieldCreate.createScalar(ScalarType.pvString), fieldCreate.createScalar(ScalarType.pvString), arguments}
+                );
+
+        // Make the query (contains the uri and arguments
+        PVStructure request = PVDataFactory.getPVDataCreate().createPVStructure(uriStructure);
+        request.getStringField("scheme").put("pva");
+
+        // Set the request path
+        request.getStringField("path").put(channelName);
+        // Set the request query values
+        PVStructure query = request.getStructureField("query");
+        argumentBuilder.initializeQuery(query);
+        return request;
     }
 
     /**
@@ -135,25 +173,7 @@ public class AidaPvaRequest {
      * @throws RPCRequestException if there is an error making the request
      */
     private PVStructure execute() throws RPCRequestException {
-        // Build the arguments structure
-        Structure arguments = argumentBuilder.build();
-
-        // Build the uri structure
-        Structure uriStructure =
-                fieldCreate.createStructure(AidaType.NTURI_ID,
-                        new String[]{"path", "scheme", "query"},
-                        new Field[]{fieldCreate.createScalar(ScalarType.pvString), fieldCreate.createScalar(ScalarType.pvString), arguments}
-                );
-
-        // Make the query (contains the uri and arguments
-        PVStructure request = PVDataFactory.getPVDataCreate().createPVStructure(uriStructure);
-        request.getStringField("scheme").put("pva");
-
-        // Set the request path
-        request.getStringField("path").put(channelName);
-        // Set the request query values
-        PVStructure query = request.getStructureField("query");
-        argumentBuilder.initializeQuery(query);
+        PVStructure request = uri();
 
         // Execute the query
         try {

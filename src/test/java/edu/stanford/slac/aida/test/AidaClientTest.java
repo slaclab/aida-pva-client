@@ -37,6 +37,25 @@ public class AidaClientTest {
     }
 
     @Test
+    void testSimpleArrayGet() {
+        try {
+            System.out.println("#############################################");
+            System.out.println("Test for pvaRequest().returning(INTEGER_ARRAY).get() - Integer Array");
+
+            Integer[] response = (Integer[]) pvaRequest("XCOR:LI31:41:BCON")
+                    .returning(INTEGER_ARRAY)
+                    .get();
+
+            assertEquals(16800, response[0]);
+
+            System.out.println("get: XCOR:LI31:41:BCON: returned: [" + response[0] + "]");
+            System.out.println("_____________________________________________\n");
+        } catch (RPCRequestException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     void testGetRequestWithNoType() {
         try {
             System.out.println("#############################################");

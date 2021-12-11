@@ -4,11 +4,10 @@
  */
 package edu.stanford.slac.aida.client;
 
+import edu.stanford.slac.aida.client.compat.AidaBiConsumer;
+import edu.stanford.slac.aida.client.compat.AidaConsumer;
 import org.epics.pvdata.pv.*;
-import org.epics.util.array.*;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * @brief Utilities to manipulate PVField.
@@ -28,10 +27,14 @@ public class PVUtils {
      * @param array    the array you provide to iterate over
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static <T extends PVField> void arrayIterator(T array, Consumer<Object> consumer) {
-        arrayLoop(array, (s, i) -> consumer.accept(s));
+    static <T extends PVField> void arrayIterator(T array, final AidaConsumer<Object> consumer) {
+        arrayLoop(array, new AidaBiConsumer<Object, Integer>() {
+            @Override
+            public void accept(Object s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -48,25 +51,64 @@ public class PVUtils {
      * @param array    the array you provide to iterate over
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
      */
-    static <T extends PVField> void arrayLoop(T array, BiConsumer<Object, Integer> consumer) {
+    static <T extends PVField> void arrayLoop(T array, final AidaBiConsumer<Object, Integer> consumer) {
         if (array instanceof PVBooleanArray) {
-            booleanArrayLoop((PVBooleanArray) array, consumer::accept);
+            booleanArrayLoop((PVBooleanArray) array, new AidaBiConsumer<Boolean, Integer>() {
+                @Override
+                public void accept(Boolean s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         } else if (array instanceof PVShortArray) {
-            shortArrayLoop((PVShortArray) array, consumer::accept);
+            shortArrayLoop((PVShortArray) array, new AidaBiConsumer<Short, Integer>() {
+                @Override
+                public void accept(Short s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         } else if (array instanceof PVIntArray) {
-            integerArrayLoop((PVIntArray) array, consumer::accept);
+            integerArrayLoop((PVIntArray) array, new AidaBiConsumer<Integer, Integer>() {
+                @Override
+                public void accept(Integer s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         } else if (array instanceof PVLongArray) {
-            longArrayLoop((PVLongArray) array, consumer::accept);
+            longArrayLoop((PVLongArray) array, new AidaBiConsumer<Long, Integer>() {
+                @Override
+                public void accept(Long s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         } else if (array instanceof PVFloatArray) {
-            floatArrayLoop((PVFloatArray) array, consumer::accept);
+            floatArrayLoop((PVFloatArray) array, new AidaBiConsumer<Float, Integer>() {
+                @Override
+                public void accept(Float s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         } else if (array instanceof PVDoubleArray) {
-            doubleArrayLoop((PVDoubleArray) array, consumer::accept);
+            doubleArrayLoop((PVDoubleArray) array, new AidaBiConsumer<Double, Integer>() {
+                @Override
+                public void accept(Double s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         } else if (array instanceof PVStringArray) {
-            stringArrayLoop((PVStringArray) array, consumer::accept);
+            stringArrayLoop((PVStringArray) array, new AidaBiConsumer<String, Integer>() {
+                @Override
+                public void accept(String s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         } else if (array instanceof PVByteArray) {
-            byteArrayLoop((PVByteArray) array, consumer::accept);
+            byteArrayLoop((PVByteArray) array, new AidaBiConsumer<Byte, Integer>() {
+                @Override
+                public void accept(Byte s, Integer i) {
+                    consumer.accept(s, i);
+                }
+            });
         }
     }
 
@@ -79,8 +121,13 @@ public class PVUtils {
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void booleanArrayIterator(PVBooleanArray array, Consumer<Boolean> consumer) {
-        booleanArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void booleanArrayIterator(PVBooleanArray array, final AidaConsumer<Boolean> consumer) {
+        booleanArrayLoop(array, new AidaBiConsumer<Boolean, Integer>() {
+            @Override
+            public void accept(Boolean s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -90,17 +137,19 @@ public class PVUtils {
      * @param array    the pv boolean array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void booleanArrayLoop(PVBooleanArray array, BiConsumer<Boolean, Integer> consumer) {
-        int index = 0, offset = 0, len = array.getLength();
+    static void booleanArrayLoop(PVBooleanArray array, AidaBiConsumer<Boolean, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        boolean[] values = new boolean[len];
         BooleanArrayData data = new BooleanArrayData();
         while (offset < len) {
             int num = array.get(offset, (len - offset), data);
-            for (int i = 0; i < num; i++) {
-                consumer.accept(data.data[offset + i], index++);
-            }
+            System.arraycopy(data.data, data.offset, values, offset, num);
             offset += num;
+        }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
         }
     }
 
@@ -113,8 +162,13 @@ public class PVUtils {
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void stringArrayIterator(PVStringArray array, Consumer<String> consumer) {
-        stringArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void stringArrayIterator(PVStringArray array, final AidaConsumer<String> consumer) {
+        stringArrayLoop(array, new AidaBiConsumer<String, Integer>() {
+            @Override
+            public void accept(String s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -124,18 +178,20 @@ public class PVUtils {
      * @param array    the pv string array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void stringArrayLoop(PVStringArray array, BiConsumer<String, Integer> consumer) {
-        int index = 0, offset = 0, len = array.getLength();
+    static void stringArrayLoop(PVStringArray array, AidaBiConsumer<String, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        String[] values = new String[len];
         StringArrayData data = new StringArrayData();
         while (offset < len) {
             int num = array.get(offset, (len - offset), data);
-            for (int i = 0; i < num; i++) {
-                consumer.accept(data.data[offset + i], index++);
-            }
+            System.arraycopy(data.data, data.offset, values, offset, num);
             offset += num;
         }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
+        }
     }
 
     /**
@@ -147,8 +203,13 @@ public class PVUtils {
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void doubleArrayIterator(PVDoubleArray array, Consumer<Double> consumer) {
-        doubleArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void doubleArrayIterator(PVDoubleArray array, final AidaConsumer<Double> consumer) {
+        doubleArrayLoop(array, new AidaBiConsumer<Double, Integer>() {
+            @Override
+            public void accept(Double s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -158,13 +219,19 @@ public class PVUtils {
      * @param array    the pv double array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void doubleArrayLoop(PVDoubleArray array, BiConsumer<Double, Integer> consumer) {
-        int index = 0;
-        IteratorDouble it = array.get().iterator();
-        while (it.hasNext()) {
-            consumer.accept(it.nextDouble(), index++);
+    static void doubleArrayLoop(PVDoubleArray array, AidaBiConsumer<Double, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        double[] values = new double[len];
+        DoubleArrayData data = new DoubleArrayData();
+        while (offset < len) {
+            int num = array.get(offset, (len - offset), data);
+            System.arraycopy(data.data, data.offset, values, offset, num);
+            offset += num;
+        }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
         }
     }
 
@@ -177,8 +244,13 @@ public class PVUtils {
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void floatArrayIterator(PVFloatArray array, Consumer<Float> consumer) {
-        floatArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void floatArrayIterator(PVFloatArray array, final AidaConsumer<Float> consumer) {
+        floatArrayLoop(array, new AidaBiConsumer<Float, Integer>() {
+            @Override
+            public void accept(Float s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -188,13 +260,19 @@ public class PVUtils {
      * @param array    the pv float array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void floatArrayLoop(PVFloatArray array, BiConsumer<Float, Integer> consumer) {
-        int index = 0;
-        IteratorFloat it = array.get().iterator();
-        while (it.hasNext()) {
-            consumer.accept(it.nextFloat(), index++);
+    static void floatArrayLoop(PVFloatArray array, AidaBiConsumer<Float, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        float[] values = new float[len];
+        FloatArrayData data = new FloatArrayData();
+        while (offset < len) {
+            int num = array.get(offset, (len - offset), data);
+            System.arraycopy(data.data, data.offset, values, offset, num);
+            offset += num;
+        }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
         }
     }
 
@@ -202,13 +280,18 @@ public class PVUtils {
      * Internal: An iterator to iterate over PVLongArray.  You can provide a consumer of the items to carry out
      * any action you want on the array elements.
      *
-     * @param array    the pv lon array
+     * @param array    the pv long array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void longArrayIterator(PVLongArray array, Consumer<Long> consumer) {
-        longArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void longArrayIterator(PVLongArray array, final AidaConsumer<Long> consumer) {
+        longArrayLoop(array, new AidaBiConsumer<Long, Integer>() {
+            @Override
+            public void accept(Long s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -218,13 +301,19 @@ public class PVUtils {
      * @param array    the pv lon array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void longArrayLoop(PVLongArray array, BiConsumer<Long, Integer> consumer) {
-        int index = 0;
-        IteratorLong it = array.get().iterator();
-        while (it.hasNext()) {
-            consumer.accept(it.nextLong(), index++);
+    static void longArrayLoop(PVLongArray array, AidaBiConsumer<Long, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        long[] values = new long[len];
+        LongArrayData data = new LongArrayData();
+        while (offset < len) {
+            int num = array.get(offset, (len - offset), data);
+            System.arraycopy(data.data, data.offset, values, offset, num);
+            offset += num;
+        }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
         }
     }
 
@@ -237,8 +326,13 @@ public class PVUtils {
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void integerArrayIterator(PVIntArray array, Consumer<Integer> consumer) {
-        integerArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void integerArrayIterator(PVIntArray array, final AidaConsumer<Integer> consumer) {
+        integerArrayLoop(array, new AidaBiConsumer<Integer, Integer>() {
+            @Override
+            public void accept(Integer s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -248,13 +342,19 @@ public class PVUtils {
      * @param array    the pv integer array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void integerArrayLoop(PVIntArray array, BiConsumer<Integer, Integer> consumer) {
-        int index = 0;
-        IteratorInteger it = array.get().iterator();
-        while (it.hasNext()) {
-            consumer.accept(it.nextInt(), index++);
+    static void integerArrayLoop(PVIntArray array, AidaBiConsumer<Integer, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        int[] values = new int[len];
+        IntArrayData data = new IntArrayData();
+        while (offset < len) {
+            int num = array.get(offset, (len - offset), data);
+            System.arraycopy(data.data, data.offset, values, offset, num);
+            offset += num;
+        }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
         }
     }
 
@@ -267,8 +367,13 @@ public class PVUtils {
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void shortArrayIterator(PVShortArray array, Consumer<Short> consumer) {
-        shortArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void shortArrayIterator(PVShortArray array, final AidaConsumer<Short> consumer) {
+        shortArrayLoop(array, new AidaBiConsumer<Short, Integer>() {
+            @Override
+            public void accept(Short s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -278,13 +383,19 @@ public class PVUtils {
      * @param array    the pv short array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void shortArrayLoop(PVShortArray array, BiConsumer<Short, Integer> consumer) {
-        int index = 0;
-        IteratorShort it = array.get().iterator();
-        while (it.hasNext()) {
-            consumer.accept(it.nextShort(), index++);
+    static void shortArrayLoop(PVShortArray array, AidaBiConsumer<Short, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        short[] values = new short[len];
+        ShortArrayData data = new ShortArrayData();
+        while (offset < len) {
+            int num = array.get(offset, (len - offset), data);
+            System.arraycopy(data.data, data.offset, values, offset, num);
+            offset += num;
+        }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
         }
     }
 
@@ -297,8 +408,13 @@ public class PVUtils {
      *                 The consumer signature
      *                 <pre>@{code consumer(Object o); }</pre>
      */
-    static void byteArrayIterator(PVByteArray array, Consumer<Byte> consumer) {
-        byteArrayLoop(array, (s, i) -> consumer.accept(s));
+    static void byteArrayIterator(PVByteArray array, final AidaConsumer<Byte> consumer) {
+        byteArrayLoop(array, new AidaBiConsumer<Byte, Integer>() {
+            @Override
+            public void accept(Byte s, Integer i) {
+                consumer.accept(s);
+            }
+        });
     }
 
     /**
@@ -308,13 +424,19 @@ public class PVUtils {
      * @param array    the pv byte array
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
-     *                 <pre>@{code biConsumer(Object o, Integer i); }</pre>
+     *                 <pre>@{code aidaBiConsumer(Object o, Integer i); }</pre>
      */
-    static void byteArrayLoop(PVByteArray array, BiConsumer<Byte, Integer> consumer) {
-        int index = 0;
-        IteratorByte it = array.get().iterator();
-        while (it.hasNext()) {
-            consumer.accept(it.nextByte(), index++);
+    static void byteArrayLoop(PVByteArray array, AidaBiConsumer<Byte, Integer> consumer) {
+        int len = array.getLength(), offset = 0;
+        byte[] values = new byte[len];
+        ByteArrayData data = new ByteArrayData();
+        while (offset < len) {
+            int num = array.get(offset, (len - offset), data);
+            System.arraycopy(data.data, data.offset, values, offset, num);
+            offset += num;
+        }
+        for (int i = 0; i < len; i++) {
+            consumer.accept(values[i], i);
         }
     }
 

@@ -1,10 +1,7 @@
 /**
  * @noop @formatter:off
  * @file
- * @brief Utility class to facilitate running all the AIDA-PVA tests.
- * - Test Suite
- *  - Tests
- *    - Test Cases
+ * @brief Class containing the AIDA-PVA client utilities.
  *
  * @see
  *  pvaRequest(),
@@ -14,20 +11,20 @@
  */
 package edu.stanford.slac.aida.client;
 
+import edu.stanford.slac.aida.client.compat.AidaConsumer;
 import edu.stanford.slac.aida.client.impl.EasyPvaRequestExecutor;
 import edu.stanford.slac.aida.client.impl.PvAcccessRequestExecutor;
 import edu.stanford.slac.aida.client.impl.PvaClientRequestExecutor;
-import org.apache.commons.lang3.tuple.Pair;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.pv.PVField;
 import org.epics.pvdata.pv.PVStringArray;
 import org.epics.pvdata.pv.PVStructure;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * @noop @formatter:off
@@ -96,17 +93,16 @@ public class AidaPvaClientUtils {
         }
 
         if (requestExecutorName.equalsIgnoreCase("PvaClient")) {
-            pvaRequestExecutor = PvaClientRequestExecutor::executeRequest;
+            pvaRequestExecutor = new PvaClientRequestExecutor();
         } else if (requestExecutorName.equalsIgnoreCase("EasyPva")) {
-            pvaRequestExecutor = EasyPvaRequestExecutor::executeRequest;
+            pvaRequestExecutor = new EasyPvaRequestExecutor();
         } else {
-            pvaRequestExecutor = PvAcccessRequestExecutor::executeRequest;
+            pvaRequestExecutor = new PvAcccessRequestExecutor();
         }
     }
 
     /**
-     * Builder for any request.  When the get() or set() are finally called the test runs and
-     * the results are displayed in a standardised format
+     * Builder for any type of request.
      *
      * @param query the starting query for this request
      * @return An AidaPvaRequest that can be further configured before calling get() or set()
@@ -152,17 +148,46 @@ public class AidaPvaClientUtils {
     }
 
     /**
+     * Convert a returned AIDA-PVA value into a simple type
+     * @param result an AIDA-PVA result value
+     * @return a simple scalar, scalar array, or PvaTable
+     */
+    public static Object pvUnpack(PVStructure result) {
+        AidaType type = AidaType.from(result);
+        Class<PVField> clazz = type.toPVFieldClass();
+
+        if (type == AidaType.VOID || clazz == null) {
+            return null;
+        }
+
+        String id = result.getStructure().getID();
+        if (AidaType.NTSCALAR_ID.equals(id)) {
+            return scalarResults(clazz, result);
+        } else if (AidaType.NTSCALARARRAY_ID.equals(id)) {
+            return scalarArrayResults(result, clazz);
+        } else if (AidaType.NTTABLE_ID.equals(id)) {
+            return tableResults(result);
+        }
+        return null;
+    }
+
+    /**
      * Convert the results structure to a list of Objects of the desired type.
      *
      * @param result the result to retrieve values from
      * @param clazz  the class to use to pull out the data.  Must extend PVField
      * @return the list of objects of the desired type
      */
-    private static <T extends PVField> List<Object> getScalarArrayValues(PVStructure result, Class<T> clazz) {
-        List<Object> values = new ArrayList<>();
+    private static <T extends PVField> Object[] getScalarArrayValues(PVStructure result, Class<T> clazz) {
+        final List<Object> values = new ArrayList<Object>();
         T array = result.getSubField(clazz, AidaType.NT_FIELD_NAME);
-        PVUtils.arrayIterator(array, values::add);
-        return values;
+        PVUtils.arrayIterator(array, new AidaConsumer<Object>() {
+            @Override
+            public void accept(Object e) {
+                values.add(e);
+            }
+        });
+        return values.toArray();
     }
 
     /**
@@ -172,25 +197,10 @@ public class AidaPvaClientUtils {
      * @param supplier the supplier of the results
      * @return the result
      */
-    protected static Object executeRequest(AidaGetter<PVStructure> supplier) throws RPCRequestException {
-        PVStructure result = supplier.get();
+    protected static Object executeRequest(AidaRequest<PVStructure> supplier) throws RPCRequestException {
+        PVStructure result = supplier.execute();
 
-        AidaType type = AidaType.from(result);
-        Class<PVField> clazz = type.toPVFieldClass();
-
-        if (type == AidaType.VOID || clazz == null) {
-            return null;
-        }
-
-        switch (result.getStructure().getID()) {
-            case AidaType.NTSCALAR_ID:
-                return scalarResults(clazz, result);
-            case AidaType.NTSCALARARRAY_ID:
-                return scalarArrayResults(result, clazz);
-            case AidaType.NTTABLE_ID:
-                return tableResults(result);
-        }
-        return null;
+        return pvUnpack(result);
     }
 
     /**
@@ -200,8 +210,8 @@ public class AidaPvaClientUtils {
      * @param supplier the supplier of the results
      * @param clazz    the PVField class of the scalar array data that will be returned from the supplier
      */
-    private static <T extends PVField> Object executeScalarArrayRequest(AidaGetter<PVStructure> supplier, Class<T> clazz) throws RPCRequestException {
-        return scalarArrayResults(supplier.get(), clazz);
+    private static <T extends PVField> Object executeScalarArrayRequest(AidaRequest<PVStructure> supplier, Class<T> clazz) throws RPCRequestException {
+        return scalarArrayResults(supplier.execute(), clazz);
     }
 
     /**
@@ -211,8 +221,8 @@ public class AidaPvaClientUtils {
      * @param supplier the supplier of the results
      * @param clazz    the PVField class of the scalar data that will be returned from the supplier
      */
-    private static <T extends PVField> Object executeScalarRequest(AidaGetter<PVStructure> supplier, Class<T> clazz) throws RPCRequestException {
-        return scalarResults(clazz, supplier.get());
+    private static <T extends PVField> Object executeScalarRequest(AidaRequest<PVStructure> supplier, Class<T> clazz) throws RPCRequestException {
+        return scalarResults(clazz, supplier.execute());
     }
 
     /**
@@ -221,12 +231,17 @@ public class AidaPvaClientUtils {
      * @param query the request
      * @param type  the scalar type expected
      */
-    private static Object getScalarRequest(final String query, AidaType type) throws RPCRequestException {
+    private static Object getScalarRequest(final String query, final AidaType type) throws RPCRequestException {
         Class<PVField> clazz = type.toPVFieldClass();
         return executeScalarRequest(
-                () -> new AidaPvaRequest(pvaRequestExecutor, query)
-                        .returning(AidaType.valueOf(realReturnType(type)))
-                        .getter(),
+                new AidaRequest<PVStructure>() {
+                    @Override
+                    public PVStructure execute() throws RPCRequestException {
+                        return new AidaPvaRequest(pvaRequestExecutor, query)
+                                .returning(AidaType.valueOf(realReturnType(type)))
+                                .getter();
+                    }
+                },
                 clazz);
     }
 
@@ -237,22 +252,32 @@ public class AidaPvaClientUtils {
      * @param type  the scalar array type expected
      * @return the array value
      */
-    private static <T extends PVField> Object getArrayRequest(final String query, AidaType type) throws RPCRequestException {
+    private static <T extends PVField> Object getArrayRequest(final String query, final AidaType type) throws RPCRequestException {
         Class<T> clazz = type.toPVFieldClass();
         return executeScalarArrayRequest(
-                () -> new AidaPvaRequest(pvaRequestExecutor, query)
-                        .returning(AidaType.valueOf(realReturnType(type)))
-                        .getter(),
+                new AidaRequest<PVStructure>() {
+                    @Override
+                    public PVStructure execute() throws RPCRequestException {
+                        return new AidaPvaRequest(pvaRequestExecutor, query)
+                                .returning(AidaType.valueOf(realReturnType(type)))
+                                .getter();
+                    }
+                },
                 clazz);
     }
 
     /**
-     * Internal: Call this to run a test and display results for scalar array channels with no arguments
+     * Internal: get table results in a PvaTable structure
      *
      * @param query the request
      */
     private static PvaTable getTableRequest(final String query) throws RPCRequestException {
-        return getTableResults(() -> new AidaPvaRequest(pvaRequestExecutor, query).returning(AidaType.TABLE).getter());
+        return getTableResults(new AidaRequest<PVStructure>() {
+            @Override
+            public PVStructure execute() throws RPCRequestException {
+                return new AidaPvaRequest(pvaRequestExecutor, query).returning(AidaType.TABLE).getter();
+            }
+        });
     }
 
     /**
@@ -273,8 +298,8 @@ public class AidaPvaClientUtils {
      *
      * @param supplier the supplier of the results
      */
-    private static PvaTable getTableResults(AidaGetter<PVStructure> supplier) throws RPCRequestException {
-        return tableResults(supplier.get());
+    private static PvaTable getTableResults(AidaRequest<PVStructure> supplier) throws RPCRequestException {
+        return tableResults(supplier.execute());
     }
 
     /**
@@ -288,20 +313,29 @@ public class AidaPvaClientUtils {
         PvaTable table = new PvaTable();
 
         // Get labels
-        List<String> labels = new ArrayList<>();
-        PVUtils.stringArrayIterator(result.getSubField(PVStringArray.class, AidaType.NT_LABELS_NAME), labels::add);
+        final List<String> labels = new ArrayList<String>();
+        PVUtils.stringArrayIterator(result.getSubField(PVStringArray.class, AidaType.NT_LABELS_NAME), new AidaConsumer<String>() {
+            @Override
+            public void accept(String t) {
+                labels.add(t);
+            }
+        });
         table.setLabels(labels);
 
         // values
-        table.setValues(
-                Arrays.stream(result.getSubField(PVStructure.class, AidaType.NT_FIELD_NAME).getPVFields())
-                        .map(column -> {
-                            List<Object> columnValues = new ArrayList<>();
-                            PVUtils.arrayIterator(column, columnValues::add);
-                            return Pair.of(column.getFieldName(), columnValues);
-                        })
-                        .collect(Collectors.toMap(Pair::getLeft, Pair::getRight))
-        );
+        Map<String, List<Object>> values = new HashMap<String, List<Object>>();
+        PVField[] pvFields = result.getSubField(PVStructure.class, AidaType.NT_FIELD_NAME).getPVFields();
+        for (PVField column : pvFields) {
+            final List<Object> columnValues = new ArrayList<Object>();
+            PVUtils.arrayIterator(column, new AidaConsumer<Object>() {
+                @Override
+                public void accept(Object s) {
+                    columnValues.add(s);
+                }
+            });
+            values.put(column.getFieldName(), columnValues);
+        }
+        table.setValues(values);
         return table;
     }
 
@@ -323,7 +357,7 @@ public class AidaPvaClientUtils {
      * @param clazz  the class of the scalar array
      * @return Scalar array values
      */
-    private static <T extends PVField> List<Object> scalarArrayResults(PVStructure result, Class<T> clazz) {
+    private static <T extends PVField> Object[] scalarArrayResults(PVStructure result, Class<T> clazz) {
         return getScalarArrayValues(result, clazz);
     }
 
