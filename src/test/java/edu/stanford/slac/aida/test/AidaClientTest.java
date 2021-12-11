@@ -42,7 +42,7 @@ public class AidaClientTest {
             System.out.println("#############################################");
             System.out.println("Test for pvaRequest().returning(INTEGER_ARRAY).get() - Integer Array");
 
-            Integer[] response = (Integer[]) pvaRequest("XCOR:LI31:41:BCON")
+            Object[] response = (Object[]) pvaRequest("XCOR:LI31:41:BCON")
                     .returning(INTEGER_ARRAY)
                     .get();
 
