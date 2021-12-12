@@ -23,12 +23,10 @@ public class PVUtils {
      *      PVBooleanArray booleanPvArray = pvStruct.getSubfield(PVBooleanArray.class, "value");
      *      arrayIterator(booleanPvArray, (bool) -> System.out.println("Value: " + bool));
      * }</pre>
-     *
-     * @param array    the array you provide to iterate over
+     *  @param array    the array you provide to iterate over
      * @param consumer the consumer function you provide to process the elements.
-     *                 The consumer signature
      */
-    static <T extends PVField> void arrayIterator(T array, final AidaConsumer<Object> consumer) {
+    static <T extends PVField> void arrayIterator(PVScalarArray array, final AidaConsumer<Object> consumer) {
         arrayLoop(array, new AidaBiConsumer<Object, Integer>() {
             @Override
             public void accept(Object s, Integer i) {
@@ -52,7 +50,7 @@ public class PVUtils {
      * @param consumer the consumer function you provide to process the elements.
      *                 The consumer signature
      */
-    static <T extends PVField> void arrayLoop(T array, final AidaBiConsumer<Object, Integer> consumer) {
+    static <T extends PVScalarArray> void arrayLoop(T array, final AidaBiConsumer<Object, Integer> consumer) {
         if (array instanceof PVBooleanArray) {
             booleanArrayLoop((PVBooleanArray) array, new AidaBiConsumer<Boolean, Integer>() {
                 @Override

@@ -110,7 +110,7 @@ class ArgumentBuilder {
     private Field getField(Object value) {
         if (value instanceof Boolean) {
             return (fieldCreate.createScalar(ScalarType.pvBoolean));
-        } else if (value instanceof Byte) {
+        } else if (value instanceof Byte || value instanceof Character) {
             return (fieldCreate.createScalar(ScalarType.pvByte));
         } else if (value instanceof Short) {
             return (fieldCreate.createScalar(ScalarType.pvShort));
@@ -138,7 +138,7 @@ class ArgumentBuilder {
             return (fieldCreate.createScalar(ScalarType.pvString));
         } else if (value instanceof Boolean[]) {
             return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
-        } else if (value instanceof Byte[]) {
+        } else if (value instanceof Byte[] || value instanceof Character[] ) {
             return (fieldCreate.createScalarArray(ScalarType.pvByte));
         } else if (value instanceof Short[]) {
             return (fieldCreate.createScalarArray(ScalarType.pvShort));
@@ -147,9 +147,21 @@ class ArgumentBuilder {
         } else if (value instanceof Long[]) {
             return (fieldCreate.createScalarArray(ScalarType.pvLong));
         } else if (value instanceof Float[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvFloat));
+            if (areIntegers(Arrays.asList(((Object[]) value)))) {
+                return (fieldCreate.createScalarArray(ScalarType.pvInt));
+            } else if (areLongs(Arrays.asList(((Object[]) value)))) {
+                return (fieldCreate.createScalarArray(ScalarType.pvLong));
+            } else {
+                return (fieldCreate.createScalarArray(ScalarType.pvFloat));
+            }
         } else if (value instanceof Double[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvDouble));
+            if (areIntegers(Arrays.asList(((Object[]) value)))) {
+                return (fieldCreate.createScalarArray(ScalarType.pvInt));
+            } else if (areLongs(Arrays.asList(((Object[]) value)))) {
+                return (fieldCreate.createScalarArray(ScalarType.pvLong));
+            } else {
+                return (fieldCreate.createScalarArray(ScalarType.pvDouble));
+            }
         } else if (value instanceof String[]) {
             return (fieldCreate.createScalarArray(ScalarType.pvString));
         } else if (value instanceof Object[]) {
@@ -163,7 +175,7 @@ class ArgumentBuilder {
             Object firstElement = valueList.get(0);
             if (firstElement instanceof Boolean) {
                 return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
-            } else if (firstElement instanceof Byte) {
+            } else if (firstElement instanceof Byte || firstElement instanceof Character) {
                 return (fieldCreate.createScalarArray(ScalarType.pvByte));
             } else if (firstElement instanceof Short) {
                 return (fieldCreate.createScalarArray(ScalarType.pvShort));
@@ -180,7 +192,13 @@ class ArgumentBuilder {
                     return (fieldCreate.createScalarArray(ScalarType.pvFloat));
                 }
             } else if (firstElement instanceof Double) {
-                return (fieldCreate.createScalarArray(ScalarType.pvDouble));
+                if (areIntegers((List<Object>) valueList)) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvInt));
+                } else if (areLongs((List<Object>) value)) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvLong));
+                } else {
+                    return (fieldCreate.createScalarArray(ScalarType.pvDouble));
+                }
             } else if (firstElement instanceof String) {
                 return (fieldCreate.createScalarArray(ScalarType.pvString));
             }
@@ -191,7 +209,7 @@ class ArgumentBuilder {
             @SuppressWarnings("unchecked") Map<String, Object> map = (Map<String, Object>) value;
             return getStructure(map);
         } else {
-            throw new RuntimeException("Unknown type specified for argument value");
+            throw new RuntimeException("Unsupported type specified for argument value: " + value.getClass());
         }
     }
 
@@ -223,7 +241,11 @@ class ArgumentBuilder {
             if (pvField instanceof PVBoolean) {
                 ((PVBoolean) (pvField)).put((Boolean) value);
             } else if (pvField instanceof PVByte) {
-                ((PVByte) (pvField)).put((Byte) value);
+                if (value instanceof Character) {
+                    ((PVByte) (pvField)).put(((byte) ((Character) value).charValue()));
+                } else {
+                    ((PVByte) (pvField)).put((Byte) value);
+                }
             } else if (pvField instanceof PVShort) {
                 ((PVShort) (pvField)).put((Short) value);
             } else if (pvField instanceof PVInt) {
@@ -261,8 +283,11 @@ class ArgumentBuilder {
                 Byte[] list;
                 if (value instanceof Byte[]) {
                     list = (Byte[]) value;
+                } else if (value instanceof Character[]) {
+                    List<Byte> valueList = toByteList(Arrays.asList((Character[]) value));
+                    list = valueList.toArray(new Byte[0]);
                 } else {
-                    List<Byte> valueList = (List<Byte>) value;
+                    List<Byte> valueList = toByteList((List<?>) value);
                     list = valueList.toArray(new Byte[0]);
                 }
                 ((PVByteArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
@@ -279,8 +304,14 @@ class ArgumentBuilder {
                 Integer[] list;
                 if (value instanceof Integer[]) {
                     list = (Integer[]) value;
+                } else if (value instanceof Float[]) {
+                    List<Integer> valueList = toIntegerList(Arrays.asList((Float[]) value));
+                    list = valueList.toArray(new Integer[0]);
+                } else if (value instanceof Double[]) {
+                    List<Integer> valueList = toIntegerList(Arrays.asList((Double[]) value));
+                    list = valueList.toArray(new Integer[0]);
                 } else {
-                    List<Integer> valueList = toIntegerList((List<Object>) value);
+                    List<Integer> valueList = toIntegerList((List<?>) value);
                     list = valueList.toArray(new Integer[0]);
                 }
                 ((PVIntArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
@@ -288,23 +319,34 @@ class ArgumentBuilder {
                 Long[] list;
                 if (value instanceof Long[]) {
                     list = (Long[]) value;
+                } else if (value instanceof Float[]) {
+                    List<Long> valueList = toLongList(Arrays.asList((Float[]) value));
+                    list = valueList.toArray(new Long[0]);
+                } else if (value instanceof Double[]) {
+                    List<Long> valueList = toLongList(Arrays.asList((Double[]) value));
+                    list = valueList.toArray(new Long[0]);
                 } else {
-                    List<Long> valueList = toLongList((List<Object>) value);
+                    List<Long> valueList = toLongList((List<?>) value);
                     list = valueList.toArray(new Long[0]);
                 }
                 ((PVLongArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
             } else if (pvField instanceof PVFloatArray) {
-                // Some values may be given as doubles even though we want floats (e.g. PI) so we need to coerce all to Floats first
-                List<Object> values = (List<Object>) value;
-                Float[] list = new Float[values.size()];
-                for (int i = 0; i < values.size(); i++) {
-                    Object val = values.get(i);
-                    if (val instanceof Float) {
-                        list[i] = ((Float) val);
-                    } else if (val instanceof Double) {
-                        list[i] = ((Double) val).floatValue();
-                    } else {
-                        list[i] = Float.parseFloat(val.toString());
+                Float[] list;
+                if (value instanceof Float[]) {
+                    list = (Float[]) value;
+                } else {
+                    // Some values may be given as doubles even though we want floats (e.g. PI) so we need to coerce all to Floats first
+                    List<Object> values = (List<Object>) value;
+                    list = new Float[values.size()];
+                    for (int i = 0; i < values.size(); i++) {
+                        Object val = values.get(i);
+                        if (val instanceof Float) {
+                            list[i] = ((Float) val);
+                        } else if (val instanceof Double) {
+                            list[i] = ((Double) val).floatValue();
+                        } else {
+                            list[i] = Float.parseFloat(val.toString());
+                        }
                     }
                 }
                 ((PVFloatArray) (pvField)).put(0, list.length, toPrimitive(list), 0);
@@ -343,7 +385,7 @@ class ArgumentBuilder {
      * @param values the list of values to convert
      * @return the converted list
      */
-    private List<Integer> toIntegerList(List<Object> values) {
+    private List<Integer> toIntegerList(List<?> values) {
         List<Integer> list = new ArrayList<Integer>();
         for (Object value : values) {
             if (value instanceof Float) {
@@ -365,7 +407,7 @@ class ArgumentBuilder {
      * @param values the list of values to convert
      * @return the converted list
      */
-    private List<Long> toLongList(List<Object> values) {
+    private List<Long> toLongList(List<?> values) {
         List<Long> list = new ArrayList<Long>();
         for (Object value : values) {
             if (value instanceof Float) {
@@ -374,6 +416,26 @@ class ArgumentBuilder {
                 list.add(((Double) value).longValue());
             } else {
                 list.add((Long) value);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Internal: When we need a byte list but may have been given chars
+     * use this method to convert everything to bytes.  Must only be used if
+     * you've already called areBytes() on the list.
+     *
+     * @param values the list of values to convert
+     * @return the converted list
+     */
+    private List<Byte> toByteList(List<?> values) {
+        List<Byte> list = new ArrayList<Byte>();
+        for (Object value : values) {
+            if (value instanceof Character) {
+                list.add((byte) ((Character) value).charValue());
+            } else {
+                list.add((Byte) value);
             }
         }
         return list;
@@ -469,6 +531,21 @@ class ArgumentBuilder {
                     return false;
                 }
             } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Internal: Return true if the given list are all byte values
+     *
+     * @param list the given list
+     * @return true if the list contains only byte integers
+     */
+    private boolean areBytes(List<Object> list) {
+        for (Object d : list) {
+            if (!(d instanceof Byte) && !(d instanceof Character)) {
                 return false;
             }
         }
