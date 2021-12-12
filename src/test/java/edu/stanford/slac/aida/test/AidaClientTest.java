@@ -146,14 +146,14 @@ public class AidaClientTest {
             assertEquals(false, table.values.get("pampl")[0], "Checking if table element is correct");
             assertEquals(false, table.values.get("pphas")[0], "Checking if table element is correct");
 
-            // Check get as
-            assertArrayEquals(new Boolean[] {false}, table.getAsBooleans("accel"), "Checking if getAsBooleans is correct");
-            assertArrayEquals(new Boolean[] {true}, table.getAsBooleans("standby"), "Checking if getAsBooleans is correct");
-            assertArrayEquals(new Boolean[] {false}, table.getAsBooleans("bad"), "Checking if getAsBooleans is correct");
-            assertArrayEquals(new Boolean[] {false}, table.getAsBooleans("sled"), "Checking if getAsBooleans is correct");
-            assertArrayEquals(new Boolean[] {true}, table.getAsBooleans("sleded"), "Checking if getAsBooleans is correct");
-            assertArrayEquals(new Boolean[] {false}, table.getAsBooleans("pampl"), "Checking if getAsBooleans is correct");
-            assertArrayEquals(new Boolean[] {false}, table.getAsBooleans("pphas"), "Checking if getAsBooleans is correct");
+            // Check get directly on table
+            assertArrayEquals(new Boolean[] {false}, table.get("accel"), "Checking if get is correct");
+            assertArrayEquals(new Boolean[] {true}, table.get("standby"), "Checking if get is correct");
+            assertArrayEquals(new Boolean[] {false}, table.get("bad"), "Checking if get is correct");
+            assertArrayEquals(new Boolean[] {false}, table.get("sled"), "Checking if get is correct");
+            assertArrayEquals(new Boolean[] {true}, table.get("sleded"), "Checking if get is correct");
+            assertArrayEquals(new Boolean[] {false}, table.get("pampl"), "Checking if get is correct");
+            assertArrayEquals(new Boolean[] {false}, table.get("pphas"), "Checking if get is correct");
 
             System.out.println("get: KLYS:LI31:31:TACT(BEAM=8,DGRP=DEV_DGRP): returned: " + table);
             System.out.println("_____________________________________________\n");
