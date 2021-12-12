@@ -168,10 +168,6 @@ public class PvaTable {
     @SuppressWarnings("unchecked")
     private <T> T[] get(String vector, Class<T[]> clazz) throws RPCRequestException {
         Object[] values = this.values.get(vector);
-        if (clazz.isInstance(values)) {
-            return ((T[]) values);
-        } else {
-            throw new RPCRequestException(WARNING, "Vector is not of the requested type.  vector: " + vector + ", requested type:" + clazz.getName() + ", actual type: " + values.getClass().getName());
-        }
+        return ((T[]) values);
     }
 }
