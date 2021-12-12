@@ -317,12 +317,11 @@ public class AidaPvaClientUtils {
      */
     static PvaTable tableResults(PVStructure result) throws RPCRequestException {
         // Get labels
-        PVStringArray labelsVector = result.getSubField(PVStringArray.class, AidaType.NT_LABELS_NAME);
-        final String[] labels = new String[labelsVector.getLength()];
-        arrayLoop(labelsVector, new AidaBiConsumer<Object, Integer>() {
+        final List<String> labels = new ArrayList<String>();
+        PVUtils.stringArrayIterator(result.getSubField(PVStringArray.class, AidaType.NT_LABELS_NAME), new AidaConsumer<String>() {
             @Override
-            public void accept(Object s, Integer i) {
-                labels[i] = s.toString();
+            public void accept(String t) {
+                labels.add(t);
             }
         });
 
