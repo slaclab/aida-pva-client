@@ -528,7 +528,7 @@ class ArgumentBuilder {
     }
 
     /**
-     * Internal: Return true if the given double is really an long integer value
+     * Internal: Return true if the given double is really a long integer value
      *
      * @param d the given double
      * @return true if the double is a long integer value
@@ -577,21 +577,6 @@ class ArgumentBuilder {
                     return false;
                 }
             } else {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Internal: Return true if the given list are all byte values
-     *
-     * @param list the given list
-     * @return true if the list contains only byte integers
-     */
-    private boolean areBytes(List<Object> list) {
-        for (Object d : list) {
-            if (!(d instanceof Byte) && !(d instanceof Character)) {
                 return false;
             }
         }
