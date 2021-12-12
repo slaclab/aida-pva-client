@@ -62,8 +62,8 @@ public class AidaClientTest {
 
             PvaTable table = (PvaTable) pvaGet("DEV_DGRP:XCOR:BDES");
             Map<String, Object[]> tableValues = table.values;
-            String[] names = (String[]) tableValues.get("name");
-            Float[] secondaryValues = (Float[]) tableValues.get("secondary");
+            Object[] names = tableValues.get("name");
+            Object[] secondaryValues = tableValues.get("secondary");
 
             assertEquals("XCOR:LI31:41", names[0], "Checking if table element is correct");
             assertEquals(0.0f, secondaryValues[0], "Checking if table element is correct");
