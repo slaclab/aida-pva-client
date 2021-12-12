@@ -20,14 +20,18 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AidaUriTest {
     @Test
     void testSimpleUri() {
-        System.out.println("#############################################");
-        System.out.println("Test for no parameter URI");
+        try {
+            System.out.println("#############################################");
+            System.out.println("Test for no parameter URI");
 
-        PVStructure uri = pvaRequest("channel")
-                .uri();
-        assertTrue(uri.checkValid(), "Checking if uri has valid structure");
-        assertEquals("epics:nt/NTURI:1.0", uri.getStructure().getID(), "Checking Structure ID");
+            PVStructure uri = pvaRequest("channel")
+                    .uri();
+            assertTrue(uri.checkValid(), "Checking if uri has valid structure");
+            assertEquals("epics:nt/NTURI:1.0", uri.getStructure().getID(), "Checking Structure ID");
 
-        System.out.println("_____________________________________________\n");
+            System.out.println("_____________________________________________\n");
+        } catch (RPCRequestException e) {
+            fail(e.getMessage());
+        }
     }
 }

@@ -2,15 +2,13 @@ package edu.stanford.slac.aida.client;
 
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @ToString
 public class PvaTable {
-    public final int size;
-    public final List<String> labels;
+    public final Integer size;
+    public final String[] labels;
     public final String[] descriptions;
     public final String[] units;
     public final Map<String, Object[]> values;
@@ -23,7 +21,7 @@ public class PvaTable {
      * @param descriptions descriptions
      * @param values       values
      */
-    PvaTable(List<String> labels, String[] units, String[] descriptions, Map<String, Object[]> values) {
+    PvaTable(String[] labels, String[] units, String[] descriptions, Map<String, Object[]> values) {
         this.labels = labels;
         this.units = units;
         this.descriptions = descriptions;
@@ -43,7 +41,7 @@ public class PvaTable {
      * @param units  units array
      * @param values values
      */
-    PvaTable(List<String> labels, String[] units, Map<String, Object[]> values) {
+    PvaTable(String[] labels, String[] units, Map<String, Object[]> values) {
         this(labels, units, new String[0], values);
     }
 
@@ -53,7 +51,7 @@ public class PvaTable {
      * @param labels labels array
      * @param values values
      */
-    PvaTable(List<String> labels, Map<String, Object[]> values) {
+    PvaTable(String[] labels, Map<String, Object[]> values) {
         this(labels, new String[0], values);
     }
 
@@ -63,7 +61,7 @@ public class PvaTable {
      * @param values values
      */
     PvaTable(Map<String, Object[]> values) {
-        this(new ArrayList<String>(), values);
+        this(new String[0], values);
     }
 
     /**

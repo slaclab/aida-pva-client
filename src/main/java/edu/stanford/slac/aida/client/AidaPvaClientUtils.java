@@ -158,7 +158,7 @@ public class AidaPvaClientUtils {
      * @param result an AIDA-PVA result value
      * @return a simple scalar, scalar array, or PvaTable
      */
-    public static Object pvUnpack(PVStructure result) throws RPCRequestException {
+    public static Object pvaUnpack(PVStructure result) throws RPCRequestException {
         AidaType type = AidaType.from(result);
         Class<? extends PVField> clazz = type.toPVFieldClass();
 
@@ -207,7 +207,7 @@ public class AidaPvaClientUtils {
     protected static Object executeRequest(AidaRequest<PVStructure> supplier) throws RPCRequestException {
         PVStructure result = supplier.execute();
 
-        return pvUnpack(result);
+        return pvaUnpack(result);
     }
 
     /**
@@ -317,11 +317,12 @@ public class AidaPvaClientUtils {
      */
     static PvaTable tableResults(PVStructure result) throws RPCRequestException {
         // Get labels
-        final List<String> labels = new ArrayList<String>();
-        PVUtils.stringArrayIterator(result.getSubField(PVStringArray.class, AidaType.NT_LABELS_NAME), new AidaConsumer<String>() {
+        PVStringArray labelsVector = result.getSubField(PVStringArray.class, AidaType.NT_LABELS_NAME);
+        final String[] labels = new String[labelsVector.getLength()];
+        arrayLoop(labelsVector, new AidaBiConsumer<Object, Integer>() {
             @Override
-            public void accept(String t) {
-                labels.add(t);
+            public void accept(Object s, Integer i) {
+                labels[i] = s.toString();
             }
         });
 

@@ -119,7 +119,7 @@ public class AidaPvaRequest {
      *
      * @return the NTURI PVStructure
      */
-    public PVStructure uri() {
+    public PVStructure uri() throws RPCRequestException {
         // Build the arguments structure
         Structure arguments = argumentBuilder.build();
 

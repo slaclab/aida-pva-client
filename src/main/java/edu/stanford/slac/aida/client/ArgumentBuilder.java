@@ -4,12 +4,14 @@
  */
 package edu.stanford.slac.aida.client;
 
+import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.factory.FieldFactory;
 import org.epics.pvdata.pv.*;
 
 import java.util.*;
 
-import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
+import static edu.stanford.slac.aida.client.compat.ArrayUtils.toPrimitive;
+import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
 /**
  * Used to build arguments for use with the AidaPvaRequest.
@@ -136,36 +138,38 @@ class ArgumentBuilder {
             }
         } else if (value instanceof String) {
             return (fieldCreate.createScalar(ScalarType.pvString));
-        } else if (value instanceof Boolean[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
-        } else if (value instanceof Byte[] || value instanceof Character[] ) {
-            return (fieldCreate.createScalarArray(ScalarType.pvByte));
-        } else if (value instanceof Short[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvShort));
-        } else if (value instanceof Integer[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvInt));
-        } else if (value instanceof Long[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvLong));
-        } else if (value instanceof Float[]) {
-            if (areIntegers(Arrays.asList(((Object[]) value)))) {
-                return (fieldCreate.createScalarArray(ScalarType.pvInt));
-            } else if (areLongs(Arrays.asList(((Object[]) value)))) {
-                return (fieldCreate.createScalarArray(ScalarType.pvLong));
-            } else {
-                return (fieldCreate.createScalarArray(ScalarType.pvFloat));
-            }
-        } else if (value instanceof Double[]) {
-            if (areIntegers(Arrays.asList(((Object[]) value)))) {
-                return (fieldCreate.createScalarArray(ScalarType.pvInt));
-            } else if (areLongs(Arrays.asList(((Object[]) value)))) {
-                return (fieldCreate.createScalarArray(ScalarType.pvLong));
-            } else {
-                return (fieldCreate.createScalarArray(ScalarType.pvDouble));
-            }
-        } else if (value instanceof String[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvString));
         } else if (value instanceof Object[]) {
-            return (fieldCreate.createScalarArray(ScalarType.pvString));
+            Object [] objects = (Object[]) value;
+            boolean hasElements = objects.length > 0;
+            if (value instanceof Boolean[] || (hasElements && objects[0] instanceof Boolean)) {
+                return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
+            } else if (value instanceof Byte[] || value instanceof Character[] || (hasElements && (objects[0] instanceof Byte  || objects[0] instanceof Character))) {
+                return (fieldCreate.createScalarArray(ScalarType.pvByte));
+            } else if (value instanceof Short[] || (hasElements && objects[0] instanceof Short)) {
+                return (fieldCreate.createScalarArray(ScalarType.pvShort));
+            } else if (value instanceof Integer[] || (hasElements && objects[0] instanceof Integer)) {
+                return (fieldCreate.createScalarArray(ScalarType.pvInt));
+            } else if (value instanceof Long[] || (hasElements && objects[0] instanceof Long)) {
+                return (fieldCreate.createScalarArray(ScalarType.pvLong));
+            } else if (value instanceof Float[] || (hasElements && objects[0] instanceof Float)) {
+                if (areIntegers(Arrays.asList(((Object[]) value)))) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvInt));
+                } else if (areLongs(Arrays.asList(((Object[]) value)))) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvLong));
+                } else {
+                    return (fieldCreate.createScalarArray(ScalarType.pvFloat));
+                }
+            } else if (value instanceof Double[] || (hasElements && objects[0] instanceof Double)) {
+                if (areIntegers(Arrays.asList(((Object[]) value)))) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvInt));
+                } else if (areLongs(Arrays.asList(((Object[]) value)))) {
+                    return (fieldCreate.createScalarArray(ScalarType.pvLong));
+                } else {
+                    return (fieldCreate.createScalarArray(ScalarType.pvDouble));
+                }
+            } else {
+                return (fieldCreate.createScalarArray(ScalarType.pvString));
+            }
         } else if (value instanceof List) {
             // determine type of list by getting first element.
             List<?> valueList = (List<?>) value;
@@ -219,7 +223,7 @@ class ArgumentBuilder {
      *
      * @param query the query
      */
-    void initializeQuery(PVStructure query) {
+    void initializeQuery(PVStructure query) throws RPCRequestException {
         initializeStructure(query, fieldMap);
     }
 
@@ -232,7 +236,7 @@ class ArgumentBuilder {
      * @param valueMap  the values to set in the structure
      */
     @SuppressWarnings("unchecked")
-    private void initializeStructure(PVStructure structure, Map<String, Object> valueMap) {
+    private void initializeStructure(PVStructure structure, Map<String, Object> valueMap) throws RPCRequestException {
         for (Map.Entry<String, Object> entrySet : valueMap.entrySet()) {
             String name = entrySet.getKey();
             Object value = entrySet.getValue();
@@ -274,6 +278,14 @@ class ArgumentBuilder {
                 Boolean[] list;
                 if (value instanceof Boolean[]) {
                     list = (Boolean[]) value;
+                } else if (value instanceof Object[]) {
+                    Object [] objects = (Object[]) value;
+                    list = new Boolean[objects.length];
+                    try {
+                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                    } catch (Exception e) {
+                        throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
+                    }
                 } else {
                     List<Boolean> valueList = (List<Boolean>) value;
                     list = valueList.toArray(new Boolean[0]);
@@ -286,6 +298,14 @@ class ArgumentBuilder {
                 } else if (value instanceof Character[]) {
                     List<Byte> valueList = toByteList(Arrays.asList((Character[]) value));
                     list = valueList.toArray(new Byte[0]);
+                } else if (value instanceof Object[]) {
+                    Object [] objects = (Object[]) value;
+                    list = new Byte[objects.length];
+                    try {
+                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                    } catch (Exception e) {
+                        throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
+                    }
                 } else {
                     List<Byte> valueList = toByteList((List<?>) value);
                     list = valueList.toArray(new Byte[0]);
@@ -295,6 +315,14 @@ class ArgumentBuilder {
                 Short[] list;
                 if (value instanceof Short[]) {
                     list = (Short[]) value;
+                } else if (value instanceof Object[]) {
+                    Object [] objects = (Object[]) value;
+                    list = new Short[objects.length];
+                    try {
+                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                    } catch (Exception e) {
+                        throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
+                    }
                 } else {
                     List<Short> valueList = (List<Short>) value;
                     list = valueList.toArray(new Short[0]);
@@ -304,11 +332,8 @@ class ArgumentBuilder {
                 Integer[] list;
                 if (value instanceof Integer[]) {
                     list = (Integer[]) value;
-                } else if (value instanceof Float[]) {
-                    List<Integer> valueList = toIntegerList(Arrays.asList((Float[]) value));
-                    list = valueList.toArray(new Integer[0]);
-                } else if (value instanceof Double[]) {
-                    List<Integer> valueList = toIntegerList(Arrays.asList((Double[]) value));
+                } else if (value instanceof Object[]) {
+                    List<Integer> valueList = toIntegerList(Arrays.asList((Object[]) value));
                     list = valueList.toArray(new Integer[0]);
                 } else {
                     List<Integer> valueList = toIntegerList((List<?>) value);
@@ -319,11 +344,8 @@ class ArgumentBuilder {
                 Long[] list;
                 if (value instanceof Long[]) {
                     list = (Long[]) value;
-                } else if (value instanceof Float[]) {
-                    List<Long> valueList = toLongList(Arrays.asList((Float[]) value));
-                    list = valueList.toArray(new Long[0]);
-                } else if (value instanceof Double[]) {
-                    List<Long> valueList = toLongList(Arrays.asList((Double[]) value));
+                } else if (value instanceof Object[]) {
+                    List<Long> valueList = toLongList(Arrays.asList((Object[]) value));
                     list = valueList.toArray(new Long[0]);
                 } else {
                     List<Long> valueList = toLongList((List<?>) value);
@@ -334,6 +356,14 @@ class ArgumentBuilder {
                 Float[] list;
                 if (value instanceof Float[]) {
                     list = (Float[]) value;
+                } else if (value instanceof Object[]) {
+                    Object [] objects = (Object[]) value;
+                    list = new Float[objects.length];
+                    try {
+                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                    } catch (Exception e) {
+                        throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
+                    }
                 } else {
                     // Some values may be given as doubles even though we want floats (e.g. PI) so we need to coerce all to Floats first
                     List<Object> values = (List<Object>) value;
@@ -354,6 +384,14 @@ class ArgumentBuilder {
                 Double[] list;
                 if (value instanceof Double[]) {
                     list = (Double[]) value;
+                } else if (value instanceof Object[]) {
+                    Object [] objects = (Object[]) value;
+                    list = new Double[objects.length];
+                    try {
+                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                    } catch (Exception e) {
+                        throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
+                    }
                 } else {
                     List<Double> valueList = (List<Double>) value;
                     list = valueList.toArray(new Double[0]);
@@ -363,6 +401,14 @@ class ArgumentBuilder {
                 String[] list;
                 if (value instanceof String[]) {
                     list = (String[]) value;
+                } else if (value instanceof Object[]) {
+                    Object [] objects = (Object[]) value;
+                    list = new String[objects.length];
+                    try {
+                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                    } catch (Exception e) {
+                        throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
+                    }
                 } else {
                     List<String> valueList = (List<String>) value;
                     list = valueList.toArray(new String[0]);
