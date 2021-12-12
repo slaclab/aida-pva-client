@@ -20,19 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AidaUriTest {
     @Test
     void testSimpleUri() {
-        try {
-            System.out.println("#############################################");
-            System.out.println("Test for no parameter URI");
+        System.out.println("#############################################");
+        System.out.println("Test for no parameter URI");
 
-            PVStructure uri = pvaRequest("channel")
-                    .uri();
-            assertTrue(uri.checkValid(), "Checking if uri has valid structure");
-            assertEquals("epics:nt/NTURI:1.0", uri.getStructure().getID(), "Checking Structure ID");
+        PVStructure uri = pvaRequest("channel")
+                .uri();
+        assertTrue(uri.checkValid(), "Checking if uri has valid structure");
+        assertEquals("epics:nt/NTURI:1.0", uri.getStructure().getID(), "Checking Structure ID");
 
-            System.out.println("get: XCOR:LI31:41:BCON: returned: " + response);
-            System.out.println("_____________________________________________\n");
-        } catch (RPCRequestException e) {
-            fail(e.getMessage());
-        }
+        System.out.println("_____________________________________________\n");
     }
 }
