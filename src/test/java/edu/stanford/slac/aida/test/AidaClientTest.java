@@ -2,14 +2,16 @@ package edu.stanford.slac.aida.test;
 
 import edu.stanford.slac.aida.client.PvaTable;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.util.Map;
 
 import static edu.stanford.slac.aida.client.AidaPvaClientUtils.*;
 import static edu.stanford.slac.aida.client.AidaType.*;
 import static edu.stanford.slac.aida.test.util.AidaClientTestUtils.abbreviate;
-import static org.junit.jupiter.api.Assertions.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * Tests for the AIDA-PVA Client.
@@ -18,15 +20,15 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class AidaClientTest {
     @Test
-    void testSimpleGet() {
+    public void testSimpleGet() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaRequest().returning(INTEGER).get() - Integer");
 
-            Integer response = (Integer) pvaRequest("XCOR:LI31:41:BCON")
+            int response = (Integer) pvaRequest("XCOR:LI31:41:BCON")
                     .returning(INTEGER)
                     .get();
-            assertEquals(16800, response, "Checking if response is correct");
+            assertEquals("Checking if response is correct", 16800, response);
 
             System.out.println("get: XCOR:LI31:41:BCON: returned: " + response);
             System.out.println("_____________________________________________\n");
@@ -36,7 +38,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testSimpleArrayGet() {
+    public void testSimpleArrayGet() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaRequest().returning(INTEGER_ARRAY).get() - Integer Array");
@@ -45,7 +47,7 @@ public class AidaClientTest {
                     .returning(INTEGER_ARRAY)
                     .get();
 
-            assertArrayEquals(new Object[]{16800}, response, "Checking if array response is correct");
+            assertArrayEquals("Checking if array response is correct", new Object[]{16800}, response);
 
             System.out.println("get: XCOR:LI31:41:BCON: returned: [" + response[0] + "]");
             System.out.println("_____________________________________________\n");
@@ -55,7 +57,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testGetRequestWithNoType() {
+    public void testGetRequestWithNoType() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaGet() - no type");
@@ -65,14 +67,14 @@ public class AidaClientTest {
             Object[] names = tableValues.get("name");
             Object[] secondaryValues = tableValues.get("secondary");
 
-            assertEquals("XCOR:LI31:41", names[0], "Checking if table element is correct");
-            assertEquals(0.0f, secondaryValues[0], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct", "XCOR:LI31:41", names[0]);
+            assertEquals("Checking if table element is correct",5.0f, secondaryValues[0]);
             assertEquals("XCOR:LI31:201", names[1], "Checking if table element is correct");
-            assertEquals(0.0f, secondaryValues[1], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct",0.0f, secondaryValues[1]);
             assertEquals("XCOR:LI31:301", names[2], "Checking if table element is correct");
-            assertEquals(0.0f, secondaryValues[2], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct",0.0f, secondaryValues[2]);
             assertEquals("XCOR:LI31:401", names[3], "Checking if table element is correct");
-            assertEquals(0.03f, secondaryValues[3], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct",0.03f, secondaryValues[3]);
 
             System.out.println("pvaGet: DEV_DGRP:XCOR:BDES: returned: " + table);
             System.out.println("_____________________________________________\n");
@@ -82,13 +84,13 @@ public class AidaClientTest {
     }
 
     @Test
-    void testGetRequest() {
+    public void testGetRequest() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaGet() - Integer");
 
-            Integer response = (Integer) pvaGet("XCOR:LI31:41:BCON", INTEGER);
-            assertEquals(16800, response, "Checking if response is correct");
+            int response = (Integer) pvaGet("XCOR:LI31:41:BCON", INTEGER);
+            assertEquals("Checking if response is correct", 16800, response);
 
             System.out.println("pvaGet: XCOR:LI31:41:BCON: returned: " + response);
             System.out.println("_____________________________________________\n");
@@ -98,7 +100,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testSimpleSet() {
+    public void testSimpleSet() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaRequest().set() - void");
@@ -113,7 +115,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testSetRequest() {
+    public void testSetRequest() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaSet() - void");
@@ -128,7 +130,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testGetTable() {
+    public void testGetTable() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaRequest().get() - PvaTable");
@@ -138,22 +140,22 @@ public class AidaClientTest {
                     .with("DGRP", "DEV_DGRP")
                     .returning(TABLE)
                     .get();
-            assertEquals(false, table.values.get("accel")[0], "Checking if table element is correct");
-            assertEquals(true, table.values.get("standby")[0], "Checking if table element is correct");
-            assertEquals(false, table.values.get("bad")[0], "Checking if table element is correct");
-            assertEquals(false, table.values.get("sled")[0], "Checking if table element is correct");
-            assertEquals(true, table.values.get("sleded")[0], "Checking if table element is correct");
-            assertEquals(false, table.values.get("pampl")[0], "Checking if table element is correct");
-            assertEquals(false, table.values.get("pphas")[0], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct", false, table.values.get("accel")[0]);
+            assertEquals("Checking if table element is correct", true, table.values.get("standby")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("bad")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("sled")[0]);
+            assertEquals("Checking if table element is correct", true, table.values.get("sleded")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("pampl")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("pphas")[0]);
 
             // Check get directly on table
-            assertArrayEquals(new Boolean[] {false}, table.get("accel"), "Checking if get is correct");
-            assertArrayEquals(new Boolean[] {true}, table.get("standby"), "Checking if get is correct");
-            assertArrayEquals(new Boolean[] {false}, table.get("bad"), "Checking if get is correct");
-            assertArrayEquals(new Boolean[] {false}, table.get("sled"), "Checking if get is correct");
-            assertArrayEquals(new Boolean[] {true}, table.get("sleded"), "Checking if get is correct");
-            assertArrayEquals(new Boolean[] {false}, table.get("pampl"), "Checking if get is correct");
-            assertArrayEquals(new Boolean[] {false}, table.get("pphas"), "Checking if get is correct");
+            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("accel"));
+            assertArrayEquals("Checking if get is correct", new Boolean[] {true}, table.get("standby"));
+            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("bad"));
+            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("sled"));
+            assertArrayEquals("Checking if get is correct", new Boolean[] {true}, table.get("sleded"));
+            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("pampl"));
+            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("pphas"));
 
             System.out.println("get: KLYS:LI31:31:TACT(BEAM=8,DGRP=DEV_DGRP): returned: " + table);
             System.out.println("_____________________________________________\n");
@@ -163,7 +165,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testSetReturningTable() {
+    public void testSetReturningTable() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for pvaRequest().set() - PvaTable");
@@ -171,7 +173,7 @@ public class AidaClientTest {
             PvaTable table = pvaRequest("KLYS:LI31:31:PDES")
                     .with("TRIM", "NO")
                     .set(90.0f);
-            assertEquals(0.0f, table.values.get("PHAS")[0], "Checking if float response is correct");
+            assertEquals("Checking if float response is correct", 0.0f, table.values.get("PHAS")[0]);
 
             System.out.println("set: KLYS:LI31:31:PDES = 0: returned: " + table);
             System.out.println("_____________________________________________\n");
@@ -181,7 +183,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testGetErrors() {
+    public void testGetErrors() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for get Errors");
@@ -192,7 +194,7 @@ public class AidaClientTest {
 
             fail("get: XCOR:LI31:4100:BCON: should have failed");
         } catch (RPCRequestException e) {
-            assertEquals("XCOR:LI31:4100:BCON(TYPE=FLOAT) : Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()), "Checking if error message is correct");
+            assertEquals("Checking if error message is correct", "XCOR:LI31:4100:BCON(TYPE=FLOAT) : Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
 
             System.out.println("get: XCOR:LI31:4100:BCON: failed as expected:" + abbreviate(e.getMessage()));
             System.out.println("_____________________________________________\n");
@@ -200,7 +202,7 @@ public class AidaClientTest {
     }
 
     @Test
-    void testSetErrors() {
+    public void testSetErrors() {
         try {
             System.out.println("#############################################");
             System.out.println("Test for set Errors");
@@ -209,7 +211,7 @@ public class AidaClientTest {
 
             fail("pvaSet: XCOR:LI31:41:BCON = FOO: should have failed");
         } catch (RPCRequestException e) {
-            assertEquals("XCOR:LI31:41:BCON(VALUE=FOO) :AidaInternalException; can't convert argument \"FOO\" to float", abbreviate(e.getMessage()), "Checking if error message is correct");
+            assertEquals("Checking if error message is correct", "XCOR:LI31:41:BCON(VALUE=FOO) :AidaInternalException; can't convert argument \"FOO\" to float", abbreviate(e.getMessage()));
 
             System.out.println("pvaSet: XCOR:LI31:41:BCON = FOO: failed as expected:" + abbreviate(e.getMessage()));
             System.out.println("_____________________________________________\n");
