@@ -71,11 +71,11 @@ public class AidaClientTest extends TestCase {
 
             assertEquals("Checking if table element is correct", "XCOR:LI31:41", names[0]);
             assertEquals("Checking if table element is correct", 5.0f, secondaryValues[0]);
-            assertEquals("XCOR:LI31:201", names[1], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct", "XCOR:LI31:201", names[1]);
             assertEquals("Checking if table element is correct", 0.0f, secondaryValues[1]);
-            assertEquals("XCOR:LI31:301", names[2], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct", "XCOR:LI31:301", names[2]);
             assertEquals("Checking if table element is correct", 0.0f, secondaryValues[2]);
-            assertEquals("XCOR:LI31:401", names[3], "Checking if table element is correct");
+            assertEquals("Checking if table element is correct", "XCOR:LI31:401", names[3]);
             assertEquals("Checking if table element is correct", 0.03f, secondaryValues[3]);
 
             System.out.println("pvaGet: DEV_DGRP:XCOR:BDES: returned: " + table);
