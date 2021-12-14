@@ -9,6 +9,7 @@ import java.util.Set;
 public class PvaTable {
     public final Integer size;
     public final String[] labels;
+    public final String[] fieldNames;
     public final String[] descriptions;
     public final String[] units;
     public final Map<String, Object[]> values;
@@ -26,6 +27,7 @@ public class PvaTable {
         this.units = units;
         this.descriptions = descriptions;
         this.values = values;
+        this.fieldNames = values.keySet().toArray(new String[0]);
         Set<Map.Entry<String, Object[]>> entrySet = values.entrySet();
         if (!entrySet.isEmpty()) {
             this.size = entrySet.iterator().next().getValue().length;
