@@ -1,16 +1,17 @@
 package edu.stanford.slac.aida.test;
 
 import edu.stanford.slac.aida.client.PvaTable;
+import junit.framework.TestCase;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.Map;
 
 import static edu.stanford.slac.aida.client.AidaPvaClientUtils.*;
 import static edu.stanford.slac.aida.client.AidaType.*;
 import static edu.stanford.slac.aida.test.util.AidaClientTestUtils.abbreviate;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertArrayEquals;
 
 /**
@@ -18,7 +19,8 @@ import static org.junit.Assert.assertArrayEquals;
  * These tests can only be run with a correct EPICs environment setup.
  * JDK 1.8, and EPICS_PVA_ADDR_LIST set to point to the DEV environment (mccdev)
  */
-public class AidaClientTest {
+@RunWith(JUnit4.class)
+public class AidaClientTest extends TestCase {
     @Test
     public void testSimpleGet() {
         try {
@@ -68,13 +70,13 @@ public class AidaClientTest {
             Object[] secondaryValues = tableValues.get("secondary");
 
             assertEquals("Checking if table element is correct", "XCOR:LI31:41", names[0]);
-            assertEquals("Checking if table element is correct",5.0f, secondaryValues[0]);
+            assertEquals("Checking if table element is correct", 5.0f, secondaryValues[0]);
             assertEquals("XCOR:LI31:201", names[1], "Checking if table element is correct");
-            assertEquals("Checking if table element is correct",0.0f, secondaryValues[1]);
+            assertEquals("Checking if table element is correct", 0.0f, secondaryValues[1]);
             assertEquals("XCOR:LI31:301", names[2], "Checking if table element is correct");
-            assertEquals("Checking if table element is correct",0.0f, secondaryValues[2]);
+            assertEquals("Checking if table element is correct", 0.0f, secondaryValues[2]);
             assertEquals("XCOR:LI31:401", names[3], "Checking if table element is correct");
-            assertEquals("Checking if table element is correct",0.03f, secondaryValues[3]);
+            assertEquals("Checking if table element is correct", 0.03f, secondaryValues[3]);
 
             System.out.println("pvaGet: DEV_DGRP:XCOR:BDES: returned: " + table);
             System.out.println("_____________________________________________\n");
@@ -149,13 +151,13 @@ public class AidaClientTest {
             assertEquals("Checking if table element is correct", false, table.values.get("pphas")[0]);
 
             // Check get directly on table
-            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("accel"));
-            assertArrayEquals("Checking if get is correct", new Boolean[] {true}, table.get("standby"));
-            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("bad"));
-            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("sled"));
-            assertArrayEquals("Checking if get is correct", new Boolean[] {true}, table.get("sleded"));
-            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("pampl"));
-            assertArrayEquals("Checking if get is correct", new Boolean[] {false}, table.get("pphas"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("accel"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{true}, table.get("standby"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("bad"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("sled"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{true}, table.get("sleded"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("pampl"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("pphas"));
 
             System.out.println("get: KLYS:LI31:31:TACT(BEAM=8,DGRP=DEV_DGRP): returned: " + table);
             System.out.println("_____________________________________________\n");

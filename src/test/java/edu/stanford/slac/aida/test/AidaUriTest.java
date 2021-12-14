@@ -1,18 +1,21 @@
 package edu.stanford.slac.aida.test;
 
+import junit.framework.TestCase;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.pv.PVStructure;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import static edu.stanford.slac.aida.client.AidaPvaClientUtils.pvaRequest;
-import static junit.framework.TestCase.*;
 
 /**
  * Tests for the AIDA-PVA Client.
  * These tests can only be run with a correct EPICs environment setup.
  * JDK 1.8, and EPICS_PVA_ADDR_LIST set to point to the DEV environment (mccdev)
  */
-public class AidaUriTest {
+@RunWith(JUnit4.class)
+public class AidaUriTest extends TestCase {
     @Test
     public void testSimpleUri() {
         try {
