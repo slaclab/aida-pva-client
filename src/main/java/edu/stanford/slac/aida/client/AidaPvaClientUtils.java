@@ -179,6 +179,16 @@ public class AidaPvaClientUtils {
     }
 
     /**
+     * As matlab can't instantiate new parametrised classes for java we provide a simple method to
+     * create a map that can be populated in matlab and then passed as an argument to a subsequent call.
+     *
+     * @return new Map
+     */
+    public static Map<String, Object> newStruct() {
+        return new HashMap<String, Object>();
+    }
+
+    /**
      * Convert the results structure to a list of Objects of the desired type.
      *
      * @param result the result to retrieve values from
