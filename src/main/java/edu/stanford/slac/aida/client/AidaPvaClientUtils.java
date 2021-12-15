@@ -13,6 +13,7 @@ package edu.stanford.slac.aida.client;
 
 import edu.stanford.slac.aida.client.compat.AidaBiConsumer;
 import edu.stanford.slac.aida.client.compat.AidaConsumer;
+import edu.stanford.slac.aida.client.impl.AidaPvaStruct;
 import edu.stanford.slac.aida.client.impl.EasyPvaRequestExecutor;
 import edu.stanford.slac.aida.client.impl.PvAcccessRequestExecutor;
 import edu.stanford.slac.aida.client.impl.PvaClientRequestExecutor;
@@ -184,8 +185,8 @@ public class AidaPvaClientUtils {
      *
      * @return new Map
      */
-    public static Map<String, Object> newStruct() {
-        return new HashMap<String, Object>();
+    public static AidaPvaStruct newStruct() {
+        return new AidaPvaStruct();
     }
 
     /**
