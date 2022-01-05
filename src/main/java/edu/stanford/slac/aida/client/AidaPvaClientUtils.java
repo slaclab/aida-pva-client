@@ -24,7 +24,7 @@ import org.epics.pvdata.pv.PVStringArray;
 import org.epics.pvdata.pv.PVStructure;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -338,7 +338,7 @@ public class AidaPvaClientUtils {
         });
 
         // values
-        Map<String, Object[]> values = new HashMap<String, Object[]>();
+        Map<String, Object[]> values = new LinkedHashMap<String, Object[]>();
         PVField[] pvFields = result.getSubField(PVStructure.class, AidaType.NT_FIELD_NAME).getPVFields();
         for (PVField column : pvFields) {
             if (!(column instanceof PVScalarArray)) {

@@ -112,7 +112,7 @@ class ArgumentBuilder {
     private Field getField(Object value) {
         if (value instanceof Boolean) {
             return (fieldCreate.createScalar(ScalarType.pvBoolean));
-        } else if (value instanceof Byte || value instanceof Character) {
+        } else if (value instanceof Byte) {
             return (fieldCreate.createScalar(ScalarType.pvByte));
         } else if (value instanceof Short) {
             return (fieldCreate.createScalar(ScalarType.pvShort));
@@ -136,14 +136,14 @@ class ArgumentBuilder {
             } else {
                 return (fieldCreate.createScalar(ScalarType.pvDouble));
             }
-        } else if (value instanceof String) {
+        } else if (value instanceof String || value instanceof Character || value instanceof Character[] ) {
             return (fieldCreate.createScalar(ScalarType.pvString));
         } else if (value instanceof Object[]) {
             Object [] objects = (Object[]) value;
             boolean hasElements = objects.length > 0;
             if (value instanceof Boolean[] || (hasElements && objects[0] instanceof Boolean)) {
                 return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
-            } else if (value instanceof Byte[] || value instanceof Character[] || (hasElements && (objects[0] instanceof Byte  || objects[0] instanceof Character))) {
+            } else if (value instanceof Byte[] || (hasElements && objects[0] instanceof Byte )) {
                 return (fieldCreate.createScalarArray(ScalarType.pvByte));
             } else if (value instanceof Short[] || (hasElements && objects[0] instanceof Short)) {
                 return (fieldCreate.createScalarArray(ScalarType.pvShort));
@@ -179,7 +179,7 @@ class ArgumentBuilder {
             Object firstElement = valueList.get(0);
             if (firstElement instanceof Boolean) {
                 return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
-            } else if (firstElement instanceof Byte || firstElement instanceof Character) {
+            } else if (firstElement instanceof Byte ) {
                 return (fieldCreate.createScalarArray(ScalarType.pvByte));
             } else if (firstElement instanceof Short) {
                 return (fieldCreate.createScalarArray(ScalarType.pvShort));
@@ -203,7 +203,7 @@ class ArgumentBuilder {
                 } else {
                     return (fieldCreate.createScalarArray(ScalarType.pvDouble));
                 }
-            } else if (firstElement instanceof String) {
+            } else if (firstElement instanceof String || firstElement instanceof Character) {
                 return (fieldCreate.createScalarArray(ScalarType.pvString));
             }
             return (fieldCreate.createScalar(ScalarType.pvString));
@@ -245,11 +245,7 @@ class ArgumentBuilder {
             if (pvField instanceof PVBoolean) {
                 ((PVBoolean) (pvField)).put((Boolean) value);
             } else if (pvField instanceof PVByte) {
-                if (value instanceof Character) {
-                    ((PVByte) (pvField)).put(((byte) ((Character) value).charValue()));
-                } else {
-                    ((PVByte) (pvField)).put((Byte) value);
-                }
+                ((PVByte) (pvField)).put((Byte) value);
             } else if (pvField instanceof PVShort) {
                 ((PVShort) (pvField)).put((Short) value);
             } else if (pvField instanceof PVInt) {
@@ -273,7 +269,18 @@ class ArgumentBuilder {
             } else if (pvField instanceof PVDouble) {
                 ((PVDouble) (pvField)).put((Double) value);
             } else if (pvField instanceof PVString) {
-                ((PVString) (pvField)).put((String) value);
+                if (value instanceof Character) {
+                    ((PVString) (pvField)).put(((Character) value).toString());
+                } else if (value instanceof Character[]) {
+                    Character[] valueArray = ((Character[])value);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for ( char character : valueArray) {
+                        stringBuilder.append(character);
+                    }
+                    ((PVString) (pvField)).put(stringBuilder.toString());
+                } else {
+                    ((PVString) (pvField)).put((String) value);
+                }
             } else if (pvField instanceof PVBooleanArray) {
                 Boolean[] list;
                 if (value instanceof Boolean[]) {
