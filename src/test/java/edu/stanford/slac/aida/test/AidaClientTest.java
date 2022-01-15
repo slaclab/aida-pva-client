@@ -70,7 +70,7 @@ public class AidaClientTest extends TestCase {
             Object[] secondaryValues = tableValues.get("secondary");
 
             assertEquals("Checking if table element is correct", "XCOR:LI31:41", names[0]);
-            assertEquals("Checking if table element is correct", 5.0f, secondaryValues[0]);
+            assertEquals("Checking if table element is correct", 4.0f, secondaryValues[0]);
             assertEquals("Checking if table element is correct", "XCOR:LI31:201", names[1]);
             assertEquals("Checking if table element is correct", 0.0f, secondaryValues[1]);
             assertEquals("Checking if table element is correct", "XCOR:LI31:301", names[2]);
