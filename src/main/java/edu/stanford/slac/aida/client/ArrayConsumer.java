@@ -47,7 +47,7 @@ public abstract class ArrayConsumer<A, D, T> {
      * @param <D>           the ArrayData subtype e.g. BooleanArrayData
      * @param <T>           the type of data that the consumer expects e.g. Boolean
      */
-    static <A extends PVArray, D extends ArrayData<B[]>, T, B> void consumeArray(A array, ArrayConsumer<A, D, T> arrayConsumer) {
+    static <A extends PVArray, D extends ArrayData<B>, T, B> void consumeArray(A array, ArrayConsumer<A, D, T> arrayConsumer) {
         int len = array.getLength(), offset = 0, index = 0;
         while (offset < len) {
             D data = arrayConsumer.create();
