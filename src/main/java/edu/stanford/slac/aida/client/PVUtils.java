@@ -29,7 +29,7 @@ public class PVUtils {
      * @param array    the array you provide to iterate over
      * @param consumer the consumer function you provide to process the elements.
      */
-    static <T extends PVField> void arrayIterator(PVScalarArray array, final AidaConsumer<Object> consumer) {
+    static void arrayIterator(PVScalarArray array, final AidaConsumer<Object> consumer) {
         arrayLoop(array, new AidaBiConsumer<Object, Integer>() {
             @Override
             public void accept(Object s, Integer i) {
@@ -130,8 +130,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVBooleanArray src, int offset, int length, BooleanArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected Boolean get(BooleanArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVBooleanArray array, int offset, int length, BooleanArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }
@@ -153,8 +158,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVStringArray src, int offset, int length, StringArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected String get(StringArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVStringArray array, int offset, int length, StringArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }
@@ -176,8 +186,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVDoubleArray src, int offset, int length, DoubleArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected Double get(DoubleArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVDoubleArray array, int offset, int length, DoubleArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }
@@ -199,8 +214,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVFloatArray src, int offset, int length, FloatArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected Float get(FloatArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVFloatArray array, int offset, int length, FloatArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }
@@ -222,8 +242,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVLongArray src, int offset, int length, LongArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected Long get(LongArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVLongArray array, int offset, int length, LongArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }
@@ -245,8 +270,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVIntArray src, int offset, int length, IntArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected Integer get(IntArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVIntArray array, int offset, int length, IntArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }
@@ -268,8 +298,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVShortArray src, int offset, int length, ShortArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected Short get(ShortArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVShortArray array, int offset, int length, ShortArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }
@@ -291,8 +326,13 @@ public class PVUtils {
             }
 
             @Override
-            public int get(PVByteArray src, int offset, int length, ByteArrayData dst) {
-                return src.get(offset, (length - offset), dst);
+            protected Byte get(ByteArrayData data, int i) {
+                return data.data[i];
+            }
+
+            @Override
+            public int get(PVByteArray array, int offset, int length, ByteArrayData data) {
+                return array.get(offset, (length - offset), data);
             }
         });
     }

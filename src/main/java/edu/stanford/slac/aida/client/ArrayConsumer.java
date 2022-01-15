@@ -16,18 +16,27 @@ public abstract class ArrayConsumer<A, D, T> {
      *
      * @return new data buffer
      */
-    public abstract D create();
+    protected abstract D create();
 
     /**
-     * Performs the data copy
+     * Get the i'th element from the given data buffer
      *
-     * @param src    the array to copy the data from
+     * @param data the given data buffer
+     * @param i    the index of the element to return
+     * @return the element
+     */
+    protected abstract T get(D data, int i);
+
+    /**
+     * Performs the data copy into the given data buffer from the given array
+     *
+     * @param array  the array to copy the data from
      * @param offset the offset into the array data
      * @param length the length of data to copy
-     * @param dst    the data buffer to copy the data into
+     * @param data   the data buffer to copy the data into
      * @return the number of items copied to the destination buffer
      */
-    public abstract int get(A src, int offset, int length, D dst);
+    protected abstract int get(A array, int offset, int length, D data);
 
     /**
      * Internal: Generic array consumer to iterate over any type of PVArray calling the consumer for each value
@@ -38,14 +47,13 @@ public abstract class ArrayConsumer<A, D, T> {
      * @param <D>           the ArrayData subtype e.g. BooleanArrayData
      * @param <T>           the type of data that the consumer expects e.g. Boolean
      */
-    @SuppressWarnings("unchecked")
-    static <A extends PVArray, D extends ArrayData<p[]>, T, p> void consumeArray(A array, ArrayConsumer<A, D, T> arrayConsumer) {
+    static <A extends PVArray, D extends ArrayData<B[]>, T, B> void consumeArray(A array, ArrayConsumer<A, D, T> arrayConsumer) {
         int len = array.getLength(), offset = 0, index = 0;
         while (offset < len) {
             D data = arrayConsumer.create();
             int num = arrayConsumer.get(array, offset, (len - offset), data);
             for (int i = 0; i < num; i++, index++) {
-                arrayConsumer.getConsumer().accept((T) data.data[i], index);
+                arrayConsumer.getConsumer().accept(arrayConsumer.get(data, i), index);
             }
             offset += num;
         }
