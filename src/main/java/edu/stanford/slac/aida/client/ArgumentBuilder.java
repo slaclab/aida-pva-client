@@ -136,14 +136,14 @@ class ArgumentBuilder {
             } else {
                 return (fieldCreate.createScalar(ScalarType.pvDouble));
             }
-        } else if (value instanceof String || value instanceof Character || value instanceof Character[] ) {
+        } else if (value instanceof String || value instanceof Character || value instanceof Character[]) {
             return (fieldCreate.createScalar(ScalarType.pvString));
         } else if (value instanceof Object[]) {
-            Object [] objects = (Object[]) value;
+            Object[] objects = (Object[]) value;
             boolean hasElements = objects.length > 0;
             if (value instanceof Boolean[] || (hasElements && objects[0] instanceof Boolean)) {
                 return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
-            } else if (value instanceof Byte[] || (hasElements && objects[0] instanceof Byte )) {
+            } else if (value instanceof Byte[] || (hasElements && objects[0] instanceof Byte)) {
                 return (fieldCreate.createScalarArray(ScalarType.pvByte));
             } else if (value instanceof Short[] || (hasElements && objects[0] instanceof Short)) {
                 return (fieldCreate.createScalarArray(ScalarType.pvShort));
@@ -179,7 +179,7 @@ class ArgumentBuilder {
             Object firstElement = valueList.get(0);
             if (firstElement instanceof Boolean) {
                 return (fieldCreate.createScalarArray(ScalarType.pvBoolean));
-            } else if (firstElement instanceof Byte ) {
+            } else if (firstElement instanceof Byte) {
                 return (fieldCreate.createScalarArray(ScalarType.pvByte));
             } else if (firstElement instanceof Short) {
                 return (fieldCreate.createScalarArray(ScalarType.pvShort));
@@ -235,7 +235,7 @@ class ArgumentBuilder {
      * @param structure the given structure
      * @param valueMap  the values to set in the structure
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "SuspiciousSystemArraycopy"})
     private void initializeStructure(PVStructure structure, Map<String, Object> valueMap) throws RPCRequestException {
         for (Map.Entry<String, Object> entrySet : valueMap.entrySet()) {
             String name = entrySet.getKey();
@@ -272,9 +272,9 @@ class ArgumentBuilder {
                 if (value instanceof Character) {
                     ((PVString) (pvField)).put(((Character) value).toString());
                 } else if (value instanceof Character[]) {
-                    Character[] valueArray = ((Character[])value);
+                    Character[] valueArray = ((Character[]) value);
                     StringBuilder stringBuilder = new StringBuilder();
-                    for ( char character : valueArray) {
+                    for (char character : valueArray) {
                         stringBuilder.append(character);
                     }
                     ((PVString) (pvField)).put(stringBuilder.toString());
@@ -286,10 +286,10 @@ class ArgumentBuilder {
                 if (value instanceof Boolean[]) {
                     list = (Boolean[]) value;
                 } else if (value instanceof Object[]) {
-                    Object [] objects = (Object[]) value;
+                    Object[] objects = (Object[]) value;
                     list = new Boolean[objects.length];
                     try {
-                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                        System.arraycopy(objects, 0, list, 0, list.length);
                     } catch (Exception e) {
                         throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
                     }
@@ -306,10 +306,10 @@ class ArgumentBuilder {
                     List<Byte> valueList = toByteList(Arrays.asList((Character[]) value));
                     list = valueList.toArray(new Byte[0]);
                 } else if (value instanceof Object[]) {
-                    Object [] objects = (Object[]) value;
+                    Object[] objects = (Object[]) value;
                     list = new Byte[objects.length];
                     try {
-                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                        System.arraycopy(objects, 0, list, 0, list.length);
                     } catch (Exception e) {
                         throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
                     }
@@ -323,10 +323,10 @@ class ArgumentBuilder {
                 if (value instanceof Short[]) {
                     list = (Short[]) value;
                 } else if (value instanceof Object[]) {
-                    Object [] objects = (Object[]) value;
+                    Object[] objects = (Object[]) value;
                     list = new Short[objects.length];
                     try {
-                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                        System.arraycopy(objects, 0, list, 0, list.length);
                     } catch (Exception e) {
                         throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
                     }
@@ -364,10 +364,10 @@ class ArgumentBuilder {
                 if (value instanceof Float[]) {
                     list = (Float[]) value;
                 } else if (value instanceof Object[]) {
-                    Object [] objects = (Object[]) value;
+                    Object[] objects = (Object[]) value;
                     list = new Float[objects.length];
                     try {
-                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                        System.arraycopy(objects, 0, list, 0, list.length);
                     } catch (Exception e) {
                         throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
                     }
@@ -392,10 +392,10 @@ class ArgumentBuilder {
                 if (value instanceof Double[]) {
                     list = (Double[]) value;
                 } else if (value instanceof Object[]) {
-                    Object [] objects = (Object[]) value;
+                    Object[] objects = (Object[]) value;
                     list = new Double[objects.length];
                     try {
-                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                        System.arraycopy(objects, 0, list, 0, list.length);
                     } catch (Exception e) {
                         throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
                     }
@@ -409,10 +409,10 @@ class ArgumentBuilder {
                 if (value instanceof String[]) {
                     list = (String[]) value;
                 } else if (value instanceof Object[]) {
-                    Object [] objects = (Object[]) value;
+                    Object[] objects = (Object[]) value;
                     list = new String[objects.length];
                     try {
-                        System.arraycopy(objects, 0, ((Object[]) list), 0, list.length);
+                        System.arraycopy(objects, 0, list, 0, list.length);
                     } catch (Exception e) {
                         throw new RPCRequestException(ERROR, "Non-homogenous array detected while initialising NTURI");
                     }

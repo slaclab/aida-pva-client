@@ -14,8 +14,7 @@ package edu.stanford.slac.aida.client;
 import edu.stanford.slac.aida.client.compat.AidaBiConsumer;
 import edu.stanford.slac.aida.client.compat.AidaConsumer;
 import edu.stanford.slac.aida.client.impl.AidaPvaStruct;
-import edu.stanford.slac.aida.client.impl.EasyPvaRequestExecutor;
-import edu.stanford.slac.aida.client.impl.PvAcccessRequestExecutor;
+import edu.stanford.slac.aida.client.impl.PvAccessRequestExecutor;
 import edu.stanford.slac.aida.client.impl.PvaClientRequestExecutor;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
 import org.epics.pvdata.pv.PVField;
@@ -100,10 +99,8 @@ public class AidaPvaClientUtils {
 
         if (requestExecutorName.equalsIgnoreCase("PvaClient")) {
             pvaRequestExecutor = new PvaClientRequestExecutor();
-        } else if (requestExecutorName.equalsIgnoreCase("EasyPva")) {
-            pvaRequestExecutor = new EasyPvaRequestExecutor();
         } else {
-            pvaRequestExecutor = new PvAcccessRequestExecutor();
+            pvaRequestExecutor = new PvAccessRequestExecutor();
         }
     }
 

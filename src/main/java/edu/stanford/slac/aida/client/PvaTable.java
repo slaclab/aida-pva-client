@@ -58,15 +58,6 @@ public class PvaTable {
     }
 
     /**
-     * Constructor for PvaTable
-     *
-     * @param values values
-     */
-    PvaTable(Map<String, Object[]> values) {
-        this(new String[0], values);
-    }
-
-    /**
      * Get the specified vector as an array
      *
      * @param vector vector to retrieve

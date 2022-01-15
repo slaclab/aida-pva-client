@@ -19,6 +19,7 @@
         <dependency>
             <groupId>org.epics</groupId>
             <artifactId>epics-core</artifactId>
+            <!--suppress MavenPackageUpdate -->
             <version>${epics-core.version}</version>
             <type>pom</type>
         </dependency>

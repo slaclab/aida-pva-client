@@ -11,7 +11,7 @@ public class PvaClientRequestExecutor implements PvaRequestExecutor {
     public PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         try {
             PVStructure response = PvaClient.get("pva").channel(channelName).rpc(request);
-            if ( response == null ) {
+            if (response == null) {
                 throw new RPCRequestException(ERROR, "error executing PvaRequest");
             }
             return response;

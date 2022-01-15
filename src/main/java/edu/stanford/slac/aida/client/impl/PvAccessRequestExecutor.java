@@ -7,7 +7,7 @@ import org.epics.pvdata.pv.PVStructure;
 
 import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
-public class PvAcccessRequestExecutor implements PvaRequestExecutor {
+public class PvAccessRequestExecutor implements PvaRequestExecutor {
     public PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
         RPCClientImpl client = null;
         try {
@@ -16,7 +16,7 @@ public class PvAcccessRequestExecutor implements PvaRequestExecutor {
         } catch (Exception e) {
             throw new RPCRequestException(ERROR, e.getMessage(), e);
         } finally {
-            if ( client != null ) {
+            if (client != null) {
                 client.destroy();
             }
         }
