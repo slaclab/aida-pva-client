@@ -12,28 +12,28 @@ import org.epics.pvdata.pv.*;
  * contains static methods to help manipulate and work with AidaType.
  */
 public enum AidaType {
-    VOID,           ///< Means that this setter does not return a value (only valid for setters)
+    AIDA_VOID,           ///< Means that this setter does not return a value (only valid for setters)
 
-    BOOLEAN,        ///< Getter returns Boolean
-    BYTE,           ///< Getter returns Byte
-    CHAR,           ///< Getter returns Byte
-    SHORT,          ///< Getter returns a Short
-    INTEGER,        ///< Getter returns an Integer
-    LONG,           ///< Getter returns a Long
-    FLOAT,          ///< Getter returns a Float
-    DOUBLE,         ///< Getter returns a Double
-    STRING,         ///< Getter returns a String
+    AIDA_BOOLEAN,        ///< Getter returns Boolean
+    AIDA_BYTE,           ///< Getter returns Byte
+    AIDA_CHAR,           ///< Getter returns Byte
+    AIDA_SHORT,          ///< Getter returns a Short
+    AIDA_INTEGER,        ///< Getter returns an Integer
+    AIDA_LONG,           ///< Getter returns a Long
+    AIDA_FLOAT,          ///< Getter returns a Float
+    AIDA_DOUBLE,         ///< Getter returns a Double
+    AIDA_STRING,         ///< Getter returns a String
 
-    BOOLEAN_ARRAY,  ///< Getter returns a List<Boolean>
-    BYTE_ARRAY,     ///< Getter returns a List<Byte>
-    CHAR_ARRAY,     ///< Getter returns a List<Byte>
-    SHORT_ARRAY,    ///< Getter returns a List<Short>
-    INTEGER_ARRAY,  ///< Getter returns an List<Integer>
-    LONG_ARRAY,     ///< Getter returns a List<Long>
-    FLOAT_ARRAY,    ///< Getter returns a List<Float>
-    DOUBLE_ARRAY,   ///< Getter returns a List<Double>
-    STRING_ARRAY,   ///< Getter returns a List<String>
-    TABLE;          ///< Getter or setter returns a PvaTable
+    AIDA_BOOLEAN_ARRAY,  ///< Getter returns a List<Boolean>
+    AIDA_BYTE_ARRAY,     ///< Getter returns a List<Byte>
+    AIDA_CHAR_ARRAY,     ///< Getter returns a List<Byte>
+    AIDA_SHORT_ARRAY,    ///< Getter returns a List<Short>
+    AIDA_INTEGER_ARRAY,  ///< Getter returns an List<Integer>
+    AIDA_LONG_ARRAY,     ///< Getter returns a List<Long>
+    AIDA_FLOAT_ARRAY,    ///< Getter returns a List<Float>
+    AIDA_DOUBLE_ARRAY,   ///< Getter returns a List<Double>
+    AIDA_STRING_ARRAY,   ///< Getter returns a List<String>
+    AIDA_TABLE;          ///< Getter or setter returns a PvaTable
 
     /**
      * Normative Type ID string for URIs
@@ -75,41 +75,41 @@ public enum AidaType {
     @SuppressWarnings("unchecked")
     public <T extends PVField> Class<T> toPVFieldClass() {
         switch (this) {
-            case BOOLEAN:
+            case AIDA_BOOLEAN:
                 return (Class<T>) PVBoolean.class;
-            case BYTE:
-            case CHAR:
+            case AIDA_BYTE:
+            case AIDA_CHAR:
                 return (Class<T>) PVByte.class;
-            case SHORT:
+            case AIDA_SHORT:
                 return (Class<T>) PVShort.class;
-            case INTEGER:
+            case AIDA_INTEGER:
                 return (Class<T>) PVInt.class;
-            case LONG:
+            case AIDA_LONG:
                 return (Class<T>) PVLong.class;
-            case FLOAT:
+            case AIDA_FLOAT:
                 return (Class<T>) PVFloat.class;
-            case DOUBLE:
+            case AIDA_DOUBLE:
                 return (Class<T>) PVDouble.class;
-            case STRING:
+            case AIDA_STRING:
                 return (Class<T>) PVString.class;
-            case BOOLEAN_ARRAY:
+            case AIDA_BOOLEAN_ARRAY:
                 return (Class<T>) PVBooleanArray.class;
-            case BYTE_ARRAY:
-            case CHAR_ARRAY:
+            case AIDA_BYTE_ARRAY:
+            case AIDA_CHAR_ARRAY:
                 return (Class<T>) PVByteArray.class;
-            case SHORT_ARRAY:
+            case AIDA_SHORT_ARRAY:
                 return (Class<T>) PVShortArray.class;
-            case INTEGER_ARRAY:
+            case AIDA_INTEGER_ARRAY:
                 return (Class<T>) PVIntArray.class;
-            case LONG_ARRAY:
+            case AIDA_LONG_ARRAY:
                 return (Class<T>) PVLongArray.class;
-            case FLOAT_ARRAY:
+            case AIDA_FLOAT_ARRAY:
                 return (Class<T>) PVFloatArray.class;
-            case DOUBLE_ARRAY:
+            case AIDA_DOUBLE_ARRAY:
                 return (Class<T>) PVDoubleArray.class;
-            case STRING_ARRAY:
+            case AIDA_STRING_ARRAY:
                 return (Class<T>) PVStringArray.class;
-            case TABLE:
+            case AIDA_TABLE:
                 return (Class<T>) PVStructure.class;
         }
         return null;
@@ -125,7 +125,7 @@ public enum AidaType {
      */
     public static AidaType from(PVStructure pvStructure) {
         if (pvStructure == null) {
-            return VOID;
+            return AIDA_VOID;
         }
 
         return from(pvStructure, NT_FIELD_NAME);
@@ -140,44 +140,44 @@ public enum AidaType {
      */
     public static AidaType from(PVStructure pvStructure, String fieldName) {
         if (pvStructure.getStructure().getID().equals(NTTABLE_ID)) {
-            return TABLE;
+            return AIDA_TABLE;
         }
 
         PVField field = pvStructure.getSubField(fieldName);
         if (field instanceof PVBoolean) {
-            return BOOLEAN;
+            return AIDA_BOOLEAN;
         } else if (field instanceof PVByte) {
-            return BYTE;
+            return AIDA_BYTE;
         } else if (field instanceof PVShort) {
-            return SHORT;
+            return AIDA_SHORT;
         } else if (field instanceof PVInt) {
-            return INTEGER;
+            return AIDA_INTEGER;
         } else if (field instanceof PVLong) {
-            return LONG;
+            return AIDA_LONG;
         } else if (field instanceof PVFloat) {
-            return FLOAT;
+            return AIDA_FLOAT;
         } else if (field instanceof PVDouble) {
-            return DOUBLE;
+            return AIDA_DOUBLE;
         } else if (field instanceof PVString) {
-            return STRING;
+            return AIDA_STRING;
         } else if (field instanceof PVBooleanArray) {
-            return BOOLEAN_ARRAY;
+            return AIDA_BOOLEAN_ARRAY;
         } else if (field instanceof PVByteArray) {
-            return BYTE_ARRAY;
+            return AIDA_BYTE_ARRAY;
         } else if (field instanceof PVShortArray) {
-            return SHORT_ARRAY;
+            return AIDA_SHORT_ARRAY;
         } else if (field instanceof PVIntArray) {
-            return INTEGER_ARRAY;
+            return AIDA_INTEGER_ARRAY;
         } else if (field instanceof PVLongArray) {
-            return LONG_ARRAY;
+            return AIDA_LONG_ARRAY;
         } else if (field instanceof PVFloatArray) {
-            return FLOAT_ARRAY;
+            return AIDA_FLOAT_ARRAY;
         } else if (field instanceof PVDoubleArray) {
-            return DOUBLE_ARRAY;
+            return AIDA_DOUBLE_ARRAY;
         } else if (field instanceof PVStringArray) {
-            return STRING_ARRAY;
+            return AIDA_STRING_ARRAY;
         } else {
-            return VOID;
+            return AIDA_VOID;
         }
     }
 }

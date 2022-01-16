@@ -23,7 +23,7 @@ import static org.epics.pvdata.pv.Status.StatusType.ERROR;
  * e.g.
  * <pre>{@code
  *      Structure argumentBuilder = new ArgumentBuilder()
- *          .argumentBuilder.addArgument("TYPE", "FLOAT");
+ *          .argumentBuilder.addArgument("TYPE", "AIDA_FLOAT");
  *
  *      // Prepare the arguments
  *      Structure arguments = argumentBuilder.build();

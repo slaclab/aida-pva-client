@@ -39,7 +39,7 @@ import static org.epics.pvdata.pv.Status.StatusType.ERROR;
  * In order to write a query it is very easy.
  * @subsection p1 e.g. 1: Simple get
  * @code
- *  Float bact = pvaGet("XCOR:LI03:120:LEFF", FLOAT);
+ *  Float bact = pvaGet("XCOR:LI03:120:LEFF", AIDA_FLOAT);
  * @endcode
  * @subsection p2 e.g. 2: Multiple arguments
  * @code
@@ -70,7 +70,7 @@ import static org.epics.pvdata.pv.Status.StatusType.ERROR;
  *  String value = pvaRequest("KLYS:LI31:31:TACT")
  *      .with("BEAM", 8)
  *      .with("DGRP", "DEV_DGRP")
- *      .returning(STRING)
+ *      .returning(AIDA_STRING)
  *      .get();
  * @endcode
  * @noop @formatter:on
@@ -131,7 +131,7 @@ public class AidaPvaClientUtils {
      */
     public static Object pvaGet(final String channel, AidaType type) throws RPCRequestException {
         String stringType = type.toString();
-        if (type.equals(AidaType.TABLE)) {
+        if (type.equals(AidaType.AIDA_TABLE)) {
             return getTableRequest(channel);
         } else if (stringType.endsWith("_ARRAY")) {
             return getArrayRequest(channel, type);
@@ -160,7 +160,7 @@ public class AidaPvaClientUtils {
         AidaType type = AidaType.from(result);
         Class<? extends PVField> clazz = type.toPVFieldClass();
 
-        if (type == AidaType.VOID || clazz == null) {
+        if (type == AidaType.AIDA_VOID || clazz == null) {
             return null;
         }
 
@@ -290,14 +290,14 @@ public class AidaPvaClientUtils {
         return getTableResults(new AidaRequest<PVStructure>() {
             @Override
             public PVStructure execute() throws RPCRequestException {
-                return new AidaPvaRequest(pvaRequestExecutor, query).returning(AidaType.TABLE).getter();
+                return new AidaPvaRequest(pvaRequestExecutor, query).returning(AidaType.AIDA_TABLE).getter();
             }
         });
     }
 
     /**
      * Internal: This will get a scalar value from the returned result structure.
-     * In AIDA-PVA CHAR does not exist so requests are made using BYTE and marshalled into char on return
+     * In AIDA-PVA AIDA_CHAR does not exist so requests are made using AIDA_BYTE and marshalled into char on return
      *
      * @param result the result to retrieve value from
      * @param clazz  the class to use to pull out the data.  Must extend PVField
@@ -387,7 +387,7 @@ public class AidaPvaClientUtils {
      * @return the real return type value for TYPE argument
      */
     private static String realReturnType(AidaType type) {
-        return type.equals(AidaType.CHAR_ARRAY) ? "BYTE_ARRAY" : type.equals(AidaType.CHAR) ? "BYTE" : type.toString();
+        return type.equals(AidaType.AIDA_CHAR_ARRAY) ? "AIDA_BYTE_ARRAY" : type.equals(AidaType.AIDA_CHAR) ? "AIDA_BYTE" : type.toString();
     }
 }
 

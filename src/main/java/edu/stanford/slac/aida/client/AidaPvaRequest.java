@@ -69,10 +69,10 @@ public class AidaPvaRequest {
      * @return AidaPvaRequest
      */
     public AidaPvaRequest returning(AidaType type) {
-        if (type.equals(AidaType.CHAR)) {
-            type = AidaType.BYTE;
-        } else if (type.equals(AidaType.CHAR_ARRAY)) {
-            type = AidaType.BYTE_ARRAY;
+        if (type.equals(AidaType.AIDA_CHAR)) {
+            type = AidaType.AIDA_BYTE;
+        } else if (type.equals(AidaType.AIDA_CHAR_ARRAY)) {
+            type = AidaType.AIDA_BYTE_ARRAY;
         }
         argumentBuilder.addArgument("TYPE", type.toString());
         return this;

@@ -25,10 +25,10 @@ public class AidaClientTest extends TestCase {
     public void testSimpleGet() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for pvaRequest().returning(INTEGER).get() - Integer");
+            System.out.println("Test for pvaRequest().returning(AIDA_INTEGER).get() - Integer");
 
             int response = (Integer) pvaRequest("XCOR:LI31:41:BCON")
-                    .returning(INTEGER)
+                    .returning(AIDA_INTEGER)
                     .get();
             assertEquals("Checking if response is correct", 16800, response);
 
@@ -43,10 +43,10 @@ public class AidaClientTest extends TestCase {
     public void testSimpleArrayGet() {
         try {
             System.out.println("#############################################");
-            System.out.println("Test for pvaRequest().returning(INTEGER_ARRAY).get() - Integer Array");
+            System.out.println("Test for pvaRequest().returning(AIDA_INTEGER_ARRAY).get() - Integer Array");
 
             Object[] response = (Object[]) pvaRequest("XCOR:LI31:41:BCON")
-                    .returning(INTEGER_ARRAY)
+                    .returning(AIDA_INTEGER_ARRAY)
                     .get();
 
             assertArrayEquals("Checking if array response is correct", new Object[]{16800}, response);
@@ -91,7 +91,7 @@ public class AidaClientTest extends TestCase {
             System.out.println("#############################################");
             System.out.println("Test for pvaGet() - Integer");
 
-            int response = (Integer) pvaGet("XCOR:LI31:41:BCON", INTEGER);
+            int response = (Integer) pvaGet("XCOR:LI31:41:BCON", AIDA_INTEGER);
             assertEquals("Checking if response is correct", 16800, response);
 
             System.out.println("pvaGet: XCOR:LI31:41:BCON: returned: " + response);
@@ -140,7 +140,7 @@ public class AidaClientTest extends TestCase {
             PvaTable table = (PvaTable) pvaRequest("KLYS:LI31:31:TACT")
                     .with("BEAM", 8)
                     .with("DGRP", "DEV_DGRP")
-                    .returning(TABLE)
+                    .returning(AIDA_TABLE)
                     .get();
             assertEquals("Checking if table element is correct", false, table.values.get("accel")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("standby")[0]);
@@ -191,12 +191,12 @@ public class AidaClientTest extends TestCase {
             System.out.println("Test for get Errors");
 
             pvaRequest("XCOR:LI31:4100:BCON")
-                    .returning(FLOAT)
+                    .returning(AIDA_FLOAT)
                     .get();
 
             fail("get: XCOR:LI31:4100:BCON: should have failed");
         } catch (RPCRequestException e) {
-            assertEquals("Checking if error message is correct", "XCOR:LI31:4100:BCON(TYPE=FLOAT) : Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
+            assertEquals("Checking if error message is correct", "XCOR:LI31:4100:BCON(TYPE=AIDA_FLOAT) : Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
 
             System.out.println("get: XCOR:LI31:4100:BCON: failed as expected:" + abbreviate(e.getMessage()));
             System.out.println("_____________________________________________\n");
