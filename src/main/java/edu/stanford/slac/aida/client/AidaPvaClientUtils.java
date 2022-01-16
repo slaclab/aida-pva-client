@@ -387,7 +387,7 @@ public class AidaPvaClientUtils {
      * @return the real return type value for TYPE argument
      */
     private static String realReturnType(AidaType type) {
-        return type.equals(AidaType.AIDA_CHAR_ARRAY) ? "BYTE_ARRAY" : type.equals(AidaType.AIDA_CHAR) ? "BYTE" : type.string();
+        return type.equals(AidaType.AIDA_CHAR_ARRAY) ? "AIDA_BYTE_ARRAY" : type.equals(AidaType.AIDA_CHAR) ? "AIDA_BYTE" : type.toString();
     }
 }
 
