@@ -35,6 +35,9 @@ public enum AidaType {
     AIDA_STRING_ARRAY,   ///< Getter returns a List<String>
     AIDA_TABLE;          ///< Getter or setter returns a PvaTable
 
+    private final static String PREFIX = "AIDA_";
+    private final static int PREFIX_LENGTH = PREFIX.length();
+
     /**
      * Normative Type ID string for URIs
      */
@@ -65,6 +68,15 @@ public enum AidaType {
      * Normative Type standard field name for description field
      */
     public static final String NT_DESCRIPTIONS_NAME = "descriptions";
+
+    /**
+     * Return the string representation of the type without the prefix
+     *
+     * @return the string representation of the type without the prefix
+     */
+    public final String string() {
+        return toString().substring(PREFIX_LENGTH);
+    }
 
     /**
      * Convert this AidaType to a PVField.

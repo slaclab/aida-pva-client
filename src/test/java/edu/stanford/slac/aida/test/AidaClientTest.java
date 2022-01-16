@@ -196,7 +196,7 @@ public class AidaClientTest extends TestCase {
 
             fail("get: XCOR:LI31:4100:BCON: should have failed");
         } catch (RPCRequestException e) {
-            assertEquals("Checking if error message is correct", "XCOR:LI31:4100:BCON(TYPE=AIDA_FLOAT) : Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
+            assertEquals("Checking if error message is correct", "XCOR:LI31:4100:BCON(TYPE=FLOAT) : Unknown Unit requested; UnableToGetDataException; getting SLC db floating point device data", abbreviate(e.getMessage()));
 
             System.out.println("get: XCOR:LI31:4100:BCON: failed as expected:" + abbreviate(e.getMessage()));
             System.out.println("_____________________________________________\n");

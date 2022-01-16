@@ -74,7 +74,7 @@ public class AidaPvaRequest {
         } else if (type.equals(AidaType.AIDA_CHAR_ARRAY)) {
             type = AidaType.AIDA_BYTE_ARRAY;
         }
-        argumentBuilder.addArgument("TYPE", type.toString());
+        argumentBuilder.addArgument("TYPE", type.string());
         return this;
     }
 

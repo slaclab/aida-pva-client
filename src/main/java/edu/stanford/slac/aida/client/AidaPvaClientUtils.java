@@ -130,7 +130,7 @@ public class AidaPvaClientUtils {
      * @param type    the type expected
      */
     public static Object pvaGet(final String channel, AidaType type) throws RPCRequestException {
-        String stringType = type.toString();
+        String stringType = type.string();
         if (type.equals(AidaType.AIDA_TABLE)) {
             return getTableRequest(channel);
         } else if (stringType.endsWith("_ARRAY")) {
@@ -297,7 +297,7 @@ public class AidaPvaClientUtils {
 
     /**
      * Internal: This will get a scalar value from the returned result structure.
-     * In AIDA-PVA AIDA_CHAR does not exist so requests are made using AIDA_BYTE and marshalled into char on return
+     * In AIDA-PVA CHAR does not exist so requests are made using BYTE and marshalled into char on return
      *
      * @param result the result to retrieve value from
      * @param clazz  the class to use to pull out the data.  Must extend PVField
@@ -387,7 +387,7 @@ public class AidaPvaClientUtils {
      * @return the real return type value for TYPE argument
      */
     private static String realReturnType(AidaType type) {
-        return type.equals(AidaType.AIDA_CHAR_ARRAY) ? "AIDA_BYTE_ARRAY" : type.equals(AidaType.AIDA_CHAR) ? "AIDA_BYTE" : type.toString();
+        return type.equals(AidaType.AIDA_CHAR_ARRAY) ? "BYTE_ARRAY" : type.equals(AidaType.AIDA_CHAR) ? "BYTE" : type.string();
     }
 }
 
