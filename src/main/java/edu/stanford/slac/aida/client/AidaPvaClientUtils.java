@@ -182,7 +182,7 @@ public class AidaPvaClientUtils {
      *
      * @return new Map
      */
-    public static AidaPvaStruct newStruct() {
+    public static AidaPvaStruct AidaPvaStruct() {
         return new AidaPvaStruct();
     }
 
