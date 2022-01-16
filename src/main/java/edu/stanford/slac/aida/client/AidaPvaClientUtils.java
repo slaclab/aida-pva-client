@@ -179,6 +179,8 @@ public class AidaPvaClientUtils {
     /**
      * As matlab can't instantiate new parametrised classes for java we provide a simple method to
      * create a map that can be populated in matlab and then passed as an argument to a subsequent call.
+     * We break the standard Java camelCase for the method so that it will look like we're instantiating a
+     * variable with a structure in matlab. e.g. `pvaStruct = AidaPvaStruct;`
      *
      * @return new Map
      */
