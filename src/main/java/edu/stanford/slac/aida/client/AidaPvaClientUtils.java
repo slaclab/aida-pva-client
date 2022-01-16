@@ -253,7 +253,7 @@ public class AidaPvaClientUtils {
                     @Override
                     public PVStructure execute() throws RPCRequestException {
                         return new AidaPvaRequest(pvaRequestExecutor, query)
-                                .returning(AidaType.valueOf(realReturnType(type)))
+                                .returning(realReturnType(type))
                                 .getter();
                     }
                 },
@@ -274,7 +274,7 @@ public class AidaPvaClientUtils {
                     @Override
                     public PVStructure execute() throws RPCRequestException {
                         return new AidaPvaRequest(pvaRequestExecutor, query)
-                                .returning(AidaType.valueOf(realReturnType(type)))
+                                .returning(realReturnType(type))
                                 .getter();
                     }
                 },
@@ -381,13 +381,13 @@ public class AidaPvaClientUtils {
     }
 
     /**
-     * Determine the real return type value for TYPE argument from the given AidaType
+     * Determine the real return type from the given AidaType
      *
      * @param type the given AidaType
-     * @return the real return type value for TYPE argument
+     * @return the real return type
      */
-    private static String realReturnType(AidaType type) {
-        return type.equals(AidaType.AIDA_CHAR_ARRAY) ? "AIDA_BYTE_ARRAY" : type.equals(AidaType.AIDA_CHAR) ? "AIDA_BYTE" : type.toString();
+    private static AidaType realReturnType(AidaType type) {
+        return type.equals(AidaType.AIDA_CHAR_ARRAY) ? AidaType.AIDA_BYTE_ARRAY : type.equals(AidaType.AIDA_CHAR) ? AidaType.AIDA_BYTE : type;
     }
 }
 
