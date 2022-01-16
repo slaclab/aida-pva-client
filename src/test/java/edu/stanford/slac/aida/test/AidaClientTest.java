@@ -91,7 +91,7 @@ public class AidaClientTest extends TestCase {
             System.out.println("#############################################");
             System.out.println("Test for pvaGet() - Integer");
 
-            int response = (Integer) pvaGet("XCOR:LI31:41:BCON", AIDA_FLOAT);
+            int response = (Integer) pvaGet("XCOR:LI31:41:BCON", AIDA_INTEGER);
             assertEquals("Checking if response is correct", 16800, response);
 
             System.out.println("pvaGet: XCOR:LI31:41:BCON: returned: " + response);
