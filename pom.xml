@@ -73,6 +73,18 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                 </transformer>
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.epics:jca</exclude>
+                                    <exclude>org.epics:epics-pvaclient</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.epics.ca</pattern>
+                                    <shadedPattern>edu.stanford.slac.org.epics.ca</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
