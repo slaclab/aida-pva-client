@@ -11,6 +11,7 @@ import org.epics.pvdata.factory.FieldFactory;
 import org.epics.pvdata.factory.PVDataFactory;
 import org.epics.pvdata.pv.*;
 
+import static edu.stanford.slac.aida.client.AidaPvaClientUtils.getterChannel;
 import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
 /**
@@ -48,6 +49,19 @@ public class AidaPvaRequest {
     AidaPvaRequest(PvaRequestExecutor requestExecutor, String channelName) {
         this.requestExecutor = requestExecutor;
         this.channelName = channelName;
+    }
+
+    /**
+     * To get the channel name fixed up for getter requests whenever needed
+     *
+     * @return fixed up channel name when getting for delegated channels
+     */
+    private String getChannelName() {
+        if (!argumentBuilder.contains("VALUE")) {
+            return getterChannel(this.channelName);
+        } else {
+            return this.channelName;
+        }
     }
 
     /**
@@ -135,7 +149,7 @@ public class AidaPvaRequest {
         request.getStringField("scheme").put("pva");
 
         // Set the request path
-        request.getStringField("path").put(channelName);
+        request.getStringField("path").put(getChannelName());
         // Set the request query values
         PVStructure query = request.getStructureField("query");
         argumentBuilder.initializeQuery(query);
@@ -177,9 +191,9 @@ public class AidaPvaRequest {
 
         // Execute the query
         try {
-            return requestExecutor.executeRequest(channelName, request);
+            return requestExecutor.executeRequest(getChannelName(), request);
         } catch (RPCRequestException e) {
-            throw new RPCRequestException(ERROR, channelName + "(" + argumentBuilder + ") :" + abbreviate(e.getMessage()));
+            throw new RPCRequestException(ERROR, getChannelName() + "(" + argumentBuilder + ") :" + abbreviate(e.getMessage()));
         }
     }
 

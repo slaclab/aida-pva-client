@@ -22,10 +22,7 @@ import org.epics.pvdata.pv.PVScalarArray;
 import org.epics.pvdata.pv.PVStringArray;
 import org.epics.pvdata.pv.PVStructure;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import static edu.stanford.slac.aida.client.PVUtils.arrayLoop;
@@ -391,5 +388,36 @@ public class AidaPvaClientUtils {
     private static AidaType realReturnType(AidaType type) {
         return type.equals(AidaType.AIDA_CHAR_ARRAY) ? AidaType.AIDA_BYTE_ARRAY : type.equals(AidaType.AIDA_CHAR) ? AidaType.AIDA_BYTE : type;
     }
+
+    /**
+     * The list of channel name endings that must be delegated
+     */
+    private static final List<String> DELEGATED_ENDINGS_LIST = Arrays.asList(":ACON", ":KPHR", ":PCON", ":PDES");
+
+    /**
+     * The list of channel name starts that must not be delegated
+     */
+    private static final List<String> DELEGATED_EXCLUDED_STARTS_LIST = Arrays.asList("ACCL:", "WORM:");
+
+    private static final String PREFIX = "SLC::";
+
+    /**
+     * For special cases of get requests that are serviced by a different provider than the setter we need to add a prefix
+     *
+     * @param channel original channel name
+     * @return the prefixed channel name if the channel needs special handling, otherwise no change
+     */
+    static String getterChannel(String channel) {
+        int len = channel.length();
+        String channelEnding = len >= 5 ? channel.substring(len - 5) : channel;
+        String channelStart = len >= 5 ? channel.substring(0, 5) : channel;
+
+        if (!channel.startsWith(PREFIX) && DELEGATED_ENDINGS_LIST.contains(channelEnding) && !DELEGATED_EXCLUDED_STARTS_LIST.contains(channelStart)) {
+            return PREFIX + channel;
+        } else {
+            return channel;
+        }
+    }
+
 }
 

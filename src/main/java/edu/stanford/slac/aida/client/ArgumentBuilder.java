@@ -102,6 +102,10 @@ class ArgumentBuilder {
         return FieldFactory.getFieldCreate().createStructure(names.toArray(new String[0]), fields.toArray(new Field[0]));
     }
 
+    boolean contains(String argument) {
+        return fieldMap.containsKey(argument);
+    }
+
     /**
      * Internal: From a given value determine the type of field that should be created to hold its value
      *
