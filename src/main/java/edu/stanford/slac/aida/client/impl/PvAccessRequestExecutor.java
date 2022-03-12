@@ -8,11 +8,11 @@ import org.epics.pvdata.pv.PVStructure;
 import static org.epics.pvdata.pv.Status.StatusType.ERROR;
 
 public class PvAccessRequestExecutor implements PvaRequestExecutor {
-    public PVStructure executeRequest(String channelName, PVStructure request) throws RPCRequestException {
+    public PVStructure executeRequest(String channelName, PVStructure request, Double timeout) throws RPCRequestException {
         RPCClientImpl client = null;
         try {
             client = new RPCClientImpl(channelName);
-            return client.request(request, 3.0);
+            return client.request(request, timeout);
         } catch (Exception e) {
             throw new RPCRequestException(ERROR, e.getMessage(), e);
         } finally {

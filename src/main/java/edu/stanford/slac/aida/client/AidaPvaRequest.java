@@ -36,6 +36,11 @@ public class AidaPvaRequest {
     private final PvaRequestExecutor requestExecutor;
 
     /**
+     * The request executor timout value
+     */
+    private Double timeout = 3.0;
+
+    /**
      * The channel name
      */
     private final String channelName;
@@ -73,6 +78,17 @@ public class AidaPvaRequest {
      */
     public AidaPvaRequest with(String name, Object value) {
         argumentBuilder.addArgument(name, value);
+        return this;
+    }
+
+    /**
+     * To set the request timeout.
+     *
+     * @param timeout the timeout to use instead of the default 3.0 seconds
+     * @return AidaPvaRequest
+     */
+    public AidaPvaRequest timeout(Double timeout) {
+        this.timeout = timeout;
         return this;
     }
 
@@ -191,7 +207,7 @@ public class AidaPvaRequest {
 
         // Execute the query
         try {
-            return requestExecutor.executeRequest(getChannelName(), request);
+            return requestExecutor.executeRequest(getChannelName(), request, this.timeout);
         } catch (RPCRequestException e) {
             throw new RPCRequestException(ERROR, getChannelName() + "(" + argumentBuilder + ") :" + abbreviate(e.getMessage()));
         }
