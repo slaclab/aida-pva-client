@@ -219,7 +219,7 @@ public class AidaClientTest extends TestCase {
             assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("pampl"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("pphas"));
 
-            System.out.println("get: KLYSTRONGET:TACT(BEAM=8,DGRP=DEV_DGRP,DEVICES=[\"KLYS:LI31:31\",\"KLYS:LI31:31\"]): returned: " + table);
+            System.out.println("get: KLYSTRONGET:TACT(BEAM=8,DEVICES=KLYS:LI31:31,KLYS:LI31:31,DGRP=DEV_DGRP): returned: " + table);
             System.out.println("_____________________________________________\n");
         } catch (RPCRequestException e) {
             fail(e.getMessage());
