@@ -144,6 +144,8 @@ public class AidaClientTest extends TestCase {
                     .timeout(10.0)
                     .returning(AIDA_TABLE)
                     .get();
+            System.out.println("get: KLYS:LI31:31:TACT(BEAM=8,DGRP=DEV_DGRP): returned: " + table);
+
             assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("opstat")[0]);
             assertEquals("Checking if table element is correct", 18, table.values.get("status")[0]);
@@ -181,10 +183,11 @@ public class AidaClientTest extends TestCase {
             System.out.println("Test for pvaRequest().get() - klystron multi-status");
 
             PvaTable table = (PvaTable) pvaRequest("KLYSTRONGET:TACT")
+                    .with("DEVICES", List.of("KLYS:LI31:31", "KLYS:LI31:31"))
                     .with("BEAM", 8)
                     .with("DGRP", "DEV_DGRP")
-                    .with("DEVICES", List.of("KLYS:LI31:31", "KLYS:LI31:31"))
                     .get();
+            System.out.println("get: KLYSTRONGET:TACT(BEAM=8,DEVICES=KLYS:LI31:31,KLYS:LI31:31,DGRP=DEV_DGRP): returned: " + table);
             assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("opstat")[0]);
             assertEquals("Checking if table element is correct", 18, table.values.get("status")[0]);
