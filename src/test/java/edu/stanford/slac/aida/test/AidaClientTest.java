@@ -1,5 +1,6 @@
 package edu.stanford.slac.aida.test;
 
+import com.sun.tools.javac.util.List;
 import edu.stanford.slac.aida.client.PvaTable;
 import junit.framework.TestCase;
 import org.epics.pvaccess.server.rpc.RPCRequestException;
@@ -143,6 +144,9 @@ public class AidaClientTest extends TestCase {
                     .timeout(10.0)
                     .returning(AIDA_TABLE)
                     .get();
+            assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[0]);
+            assertEquals("Checking if table element is correct", true, table.values.get("opstat")[0]);
+            assertEquals("Checking if table element is correct", 18, table.values.get("status")[0]);
             assertEquals("Checking if table element is correct", false, table.values.get("accel")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("standby")[0]);
             assertEquals("Checking if table element is correct", false, table.values.get("bad")[0]);
@@ -152,6 +156,9 @@ public class AidaClientTest extends TestCase {
             assertEquals("Checking if table element is correct", false, table.values.get("pphas")[0]);
 
             // Check get directly on table
+            assertArrayEquals("Checking if get is correct", new String[]{"KLYS:LI31:31"}, table.get("name"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{true}, table.get("opstat"));
+            assertArrayEquals("Checking if get is correct", new Integer[]{18}, table.get("status"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("accel"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{true}, table.get("standby"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("bad"));
@@ -161,6 +168,58 @@ public class AidaClientTest extends TestCase {
             assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("pphas"));
 
             System.out.println("get: KLYS:LI31:31:TACT(BEAM=8,DGRP=DEV_DGRP): returned: " + table);
+            System.out.println("_____________________________________________\n");
+        } catch (RPCRequestException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetMultiStatus() {
+        try {
+            System.out.println("#############################################");
+            System.out.println("Test for pvaRequest().get() - klystron multi-status");
+
+            PvaTable table = (PvaTable) pvaRequest("KLYSTRONGET:TACT")
+                    .with("BEAM", 8)
+                    .with("DGRP", "DEV_DGRP")
+                    .with("DEVICES", List.of("KLYS:LI31:31", "KLYS:LI31:31"))
+                    .get();
+            assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[0]);
+            assertEquals("Checking if table element is correct", true, table.values.get("opstat")[0]);
+            assertEquals("Checking if table element is correct", 18, table.values.get("status")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("accel")[0]);
+            assertEquals("Checking if table element is correct", true, table.values.get("standby")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("bad")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("sled")[0]);
+            assertEquals("Checking if table element is correct", true, table.values.get("sleded")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("pampl")[0]);
+            assertEquals("Checking if table element is correct", false, table.values.get("pphas")[0]);
+
+            assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[1]);
+            assertEquals("Checking if table element is correct", true, table.values.get("opstat")[1]);
+            assertEquals("Checking if table element is correct", 18, table.values.get("status")[1]);
+            assertEquals("Checking if table element is correct", false, table.values.get("accel")[1]);
+            assertEquals("Checking if table element is correct", true, table.values.get("standby")[1]);
+            assertEquals("Checking if table element is correct", false, table.values.get("bad")[1]);
+            assertEquals("Checking if table element is correct", false, table.values.get("sled")[1]);
+            assertEquals("Checking if table element is correct", true, table.values.get("sleded")[1]);
+            assertEquals("Checking if table element is correct", false, table.values.get("pampl")[1]);
+            assertEquals("Checking if table element is correct", false, table.values.get("pphas")[1]);
+
+            // Check get directly on table
+            assertArrayEquals("Checking if get is correct", new String[]{"KLYS:LI31:31", "KLYS:LI31:31"}, table.get("name"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{true, true}, table.get("opstat"));
+            assertArrayEquals("Checking if get is correct", new Integer[]{18, 18}, table.get("status"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("accel"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{true, true}, table.get("standby"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("bad"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("sled"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{true, true}, table.get("sleded"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("pampl"));
+            assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("pphas"));
+
+            System.out.println("get: KLYSTRONGET:TACT(BEAM=8,DGRP=DEV_DGRP,DEVICES=[\"KLYS:LI31:31\",\"KLYS:LI31:31\"]): returned: " + table);
             System.out.println("_____________________________________________\n");
         } catch (RPCRequestException e) {
             fail(e.getMessage());
