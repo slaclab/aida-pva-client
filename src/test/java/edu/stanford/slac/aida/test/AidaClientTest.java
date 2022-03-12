@@ -140,6 +140,7 @@ public class AidaClientTest extends TestCase {
             PvaTable table = (PvaTable) pvaRequest("KLYS:LI31:31:TACT")
                     .with("BEAM", 8)
                     .with("DGRP", "DEV_DGRP")
+                    .timeout(10.0)
                     .returning(AIDA_TABLE)
                     .get();
             assertEquals("Checking if table element is correct", false, table.values.get("accel")[0]);
