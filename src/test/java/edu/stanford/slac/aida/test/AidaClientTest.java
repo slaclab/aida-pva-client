@@ -148,7 +148,7 @@ public class AidaClientTest extends TestCase {
 
             assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("opstat")[0]);
-            assertEquals("Checking if table element is correct", 18, table.values.get("status")[0]);
+            assertEquals("Checking if table element is correct", (short) 18, table.values.get("status")[0]);
             assertEquals("Checking if table element is correct", false, table.values.get("accel")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("standby")[0]);
             assertEquals("Checking if table element is correct", false, table.values.get("bad")[0]);
@@ -160,7 +160,7 @@ public class AidaClientTest extends TestCase {
             // Check get directly on table
             assertArrayEquals("Checking if get is correct", new String[]{"KLYS:LI31:31"}, table.get("name"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{true}, table.get("opstat"));
-            assertArrayEquals("Checking if get is correct", new Integer[]{18}, table.get("status"));
+            assertArrayEquals("Checking if get is correct", new Short[]{18}, table.get("status"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("accel"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{true}, table.get("standby"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{false}, table.get("bad"));
@@ -190,7 +190,7 @@ public class AidaClientTest extends TestCase {
             System.out.println("get: KLYSTRONGET:TACT(BEAM=8,DEVICES=KLYS:LI31:31,KLYS:LI31:31,DGRP=DEV_DGRP): returned: " + table);
             assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("opstat")[0]);
-            assertEquals("Checking if table element is correct", 18, table.values.get("status")[0]);
+            assertEquals("Checking if table element is correct", (short) 18, table.values.get("status")[0]);
             assertEquals("Checking if table element is correct", false, table.values.get("accel")[0]);
             assertEquals("Checking if table element is correct", true, table.values.get("standby")[0]);
             assertEquals("Checking if table element is correct", false, table.values.get("bad")[0]);
@@ -201,7 +201,7 @@ public class AidaClientTest extends TestCase {
 
             assertEquals("Checking if table element is correct", "KLYS:LI31:31", table.values.get("name")[1]);
             assertEquals("Checking if table element is correct", true, table.values.get("opstat")[1]);
-            assertEquals("Checking if table element is correct", 18, table.values.get("status")[1]);
+            assertEquals("Checking if table element is correct", (short) 18, table.values.get("status")[1]);
             assertEquals("Checking if table element is correct", false, table.values.get("accel")[1]);
             assertEquals("Checking if table element is correct", true, table.values.get("standby")[1]);
             assertEquals("Checking if table element is correct", false, table.values.get("bad")[1]);
@@ -213,7 +213,7 @@ public class AidaClientTest extends TestCase {
             // Check get directly on table
             assertArrayEquals("Checking if get is correct", new String[]{"KLYS:LI31:31", "KLYS:LI31:31"}, table.get("name"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{true, true}, table.get("opstat"));
-            assertArrayEquals("Checking if get is correct", new Integer[]{18, 18}, table.get("status"));
+            assertArrayEquals("Checking if get is correct", new Short[]{18, 18}, table.get("status"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("accel"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{true, true}, table.get("standby"));
             assertArrayEquals("Checking if get is correct", new Boolean[]{false, false}, table.get("bad"));
