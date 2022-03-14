@@ -93,6 +93,17 @@ public class AidaPvaRequest {
     }
 
     /**
+     * To set the request timeout.  This takes an Object and casts as a Double safely
+     *
+     * @param timeout the timeout to use instead of the default 3.0 seconds
+     * @return AidaPvaRequest
+     */
+    public AidaPvaRequest timeout(Object timeout) {
+        timeout(Double.valueOf(timeout.toString()));
+        return this;
+    }
+
+    /**
      * To set return type of the request
      *
      * @param type return type to set
