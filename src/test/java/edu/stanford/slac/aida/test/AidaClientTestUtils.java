@@ -1,4 +1,4 @@
-package edu.stanford.slac.aida.test.util;
+package edu.stanford.slac.aida.test;
 
 public class AidaClientTestUtils {
     /**
