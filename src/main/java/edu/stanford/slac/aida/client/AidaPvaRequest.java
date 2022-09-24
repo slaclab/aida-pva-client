@@ -363,6 +363,7 @@ public class AidaPvaRequest {
      */
     public AidaPvaRequest timeout(Double timeout) {
         this.timeout = timeout;
+        this.argumentBuilder.addArgument("TIMEOUT", Double.valueOf(Math.ceil(timeout)).intValue());
         return this;
     }
 
