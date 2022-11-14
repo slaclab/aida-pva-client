@@ -6,13 +6,13 @@
 
     <groupId>edu.stanford.slac</groupId>
     <artifactId>aida-pva-client</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <properties>
         <java.version>8</java.version>
         <maven.compiler.source>6</maven.compiler.source>
         <maven.compiler.target>6</maven.compiler.target>
-        <epics-core.version>7.0.6</epics-core.version>
+        <epics-core.version>7.0.8</epics-core.version>
     </properties>
 
     <dependencies>
